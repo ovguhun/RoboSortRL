@@ -18,10 +18,10 @@ namespace RoboSortRL.Simulation
 
         [Header("Safety")]
         [SerializeField] private float maxLifetimeSeconds = 15f;
-        [SerializeField] private bool destroyOnLifetimeExpired = true;
 
         private Rigidbody rb;
         private float lifetime;
+        private bool lifetimeExpiredReported;
 
         private Vector3 requestedExternalVelocity;
 
@@ -37,6 +37,7 @@ namespace RoboSortRL.Simulation
         private void OnEnable()
         {
             lifetime = 0f;
+            lifetimeExpiredReported = false;
             requestedExternalVelocity = Vector3.zero;
             LastFrameVelocity = Vector3.zero;
         }
@@ -55,6 +56,7 @@ namespace RoboSortRL.Simulation
                 : Vector3.forward;
 
             lifetime = 0f;
+            lifetimeExpiredReported = false;
             requestedExternalVelocity = Vector3.zero;
             LastFrameVelocity = Vector3.zero;
         }
@@ -111,6 +113,11 @@ namespace RoboSortRL.Simulation
 
         private void TrackLifetime(float deltaTime)
         {
+            if (lifetimeExpiredReported)
+            {
+                return;
+            }
+
             lifetime += deltaTime;
 
             if (lifetime <= maxLifetimeSeconds)
@@ -118,13 +125,18 @@ namespace RoboSortRL.Simulation
                 return;
             }
 
-            LifetimeExpired?.Invoke(this);
+            lifetimeExpiredReported = true;
 
-            if (destroyOnLifetimeExpired)
+            if (LifetimeExpired == null)
             {
-                Debug.LogWarning($"{nameof(ConveyorMover)}: Product exceeded lifetime and will be destroyed. Product={name}", this);
-                Destroy(gameObject);
+                Debug.LogWarning(
+                    $"{nameof(ConveyorMover)}: Lifetime expired but no listener handled cleanup. Product={name}",
+                    this
+                );
+                return;
             }
+
+            LifetimeExpired.Invoke(this);
         }
     }
 }

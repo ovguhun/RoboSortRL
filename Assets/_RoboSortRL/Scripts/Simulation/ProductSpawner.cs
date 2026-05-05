@@ -39,9 +39,7 @@ namespace RoboSortRL.Simulation
 
         private void Awake()
         {
-            rng = useFixedSeed
-                ? new System.Random(randomSeed)
-                : new System.Random(Guid.NewGuid().GetHashCode());
+            InitializeRng();
         }
 
         private void Start()
@@ -144,7 +142,7 @@ namespace RoboSortRL.Simulation
             }
 
             activeProducts.Remove(product);
-            Destroy(product.gameObject);
+            SafelyDestroyProduct(product);
         }
 
         public void ClearProducts()
@@ -155,12 +153,38 @@ namespace RoboSortRL.Simulation
 
                 if (product != null)
                 {
-                    Destroy(product.gameObject);
+                    SafelyDestroyProduct(product);
                 }
             }
 
             activeProducts.Clear();
             spawnTimer = 0f;
+        }
+
+        public void ResetSpawnTimer()
+        {
+            spawnTimer = 0f;
+        }
+
+        private void InitializeRng()
+        {
+            rng = useFixedSeed
+                ? new System.Random(randomSeed)
+                : new System.Random(Guid.NewGuid().GetHashCode());
+        }
+
+        private void SafelyDestroyProduct(Product product)
+        {
+            ConveyorMover mover = product.GetComponent<ConveyorMover>();
+
+            if (mover != null)
+            {
+                mover.LifetimeExpired -= HandleProductLifetimeExpired;
+            }
+
+            // Disable immediately so the product cannot trigger zones during reset cleanup.
+            product.gameObject.SetActive(false);
+            Destroy(product.gameObject);
         }
 
         private void HandleProductLifetimeExpired(ConveyorMover mover)
@@ -172,12 +196,12 @@ namespace RoboSortRL.Simulation
 
             Product product = mover.GetComponent<Product>();
 
-            if (product != null)
+            if (product == null)
             {
-                activeProducts.Remove(product);
+                return;
             }
 
-            mover.LifetimeExpired -= HandleProductLifetimeExpired;
+            DespawnProduct(product);
         }
 
         private void CleanupNullReferences()
