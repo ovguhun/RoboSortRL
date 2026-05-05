@@ -3,7 +3,14 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 3
-  tags: []
+  tags:
+  - GoodProduct
+  - DefectProduct
+  - RejectZone
+  - AcceptZone
+  - Conveyor
+  - Wall
+  - Sorter
   layers:
   - Default
   - TransparentFX
@@ -11,11 +18,11 @@ TagManager:
   - 
   - Water
   - UI
-  - 
-  - 
-  - 
-  - 
-  - 
+  - Agent
+  - Product
+  - Zone
+  - Obstacle
+  - VisualOnly
   - 
   - 
   - 
