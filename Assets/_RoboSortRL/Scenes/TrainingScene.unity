@@ -1015,6 +1015,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RoboSortRL.Simulation.ManualSorterInput
   sorterController: {fileID: 642439799}
+  episodeManager: {fileID: 1403137446}
   enableManualInput: 1
   carriageInput: 0
   extensionInput: 0
