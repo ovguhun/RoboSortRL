@@ -950,6 +950,7 @@ GameObject:
   m_Component:
   - component: {fileID: 642439798}
   - component: {fileID: 642439799}
+  - component: {fileID: 642439800}
   m_Layer: 0
   m_Name: SorterProxy
   m_TagString: Untagged
@@ -1000,6 +1001,23 @@ MonoBehaviour:
   currentCarriageZOffset: 0
   currentExtensionAmount: 0
   currentPushStrength: 0
+--- !u!114 &642439800
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 642439797}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d88f65109a795de449722bd6b1574ebe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RoboSortRL.Simulation.ManualSorterInput
+  sorterController: {fileID: 642439799}
+  enableManualInput: 1
+  carriageInput: 0
+  extensionInput: 0
+  pushStrengthInput: -1
 --- !u!1 &673723107
 GameObject:
   m_ObjectHideFlags: 0
