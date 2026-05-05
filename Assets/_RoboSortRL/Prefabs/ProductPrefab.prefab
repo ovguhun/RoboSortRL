@@ -156,8 +156,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RoboSortRL.Simulation.Product
   productType: 0
   hasBeenProcessed: 0
-  goodMaterial: {fileID: 0}
-  defectiveMaterial: {fileID: 0}
+  goodMaterial: {fileID: 2100000, guid: f34443b98af4f5944b1430c0b2318dd5, type: 2}
+  defectiveMaterial: {fileID: 2100000, guid: 4b00e7911773f134e98749c26fc97c82, type: 2}
 --- !u!114 &7879454000163622913
 MonoBehaviour:
   m_ObjectHideFlags: 0
