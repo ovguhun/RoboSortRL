@@ -582,7 +582,7 @@ MonoBehaviour:
   spawnPoint: {fileID: 327863260}
   productContainer: {fileID: 390952255}
   spawnOnStart: 1
-  autoSpawn: 1
+  autoSpawn: 0
   spawnIntervalSeconds: 2.5
   defectProbability: 0.5
   useFixedSeed: 1
@@ -949,6 +949,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 642439798}
+  - component: {fileID: 642439799}
   m_Layer: 0
   m_Name: SorterProxy
   m_TagString: Untagged
@@ -973,6 +974,32 @@ Transform:
   - {fileID: 1252444963}
   m_Father: {fileID: 1790665031}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &642439799
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 642439797}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8f02dc70592342648ac73c2e7d9d6a17, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RoboSortRL.Simulation.SorterController
+  sorterBaseProxy: {fileID: 1600084091}
+  pusherProxy: {fileID: 1252444963}
+  minCarriageZOffset: -1
+  maxCarriageZOffset: 1
+  carriageMoveSpeed: 2
+  retractedLocalX: -1.37
+  extendedLocalX: 0.85
+  extensionMoveSpeed: 3
+  requestedCarriageInput: 0
+  requestedExtensionInput: 0
+  requestedPushStrengthInput: 0
+  currentCarriageZOffset: 0
+  currentExtensionAmount: 0
+  currentPushStrength: 0
 --- !u!1 &673723107
 GameObject:
   m_ObjectHideFlags: 0
@@ -1197,6 +1224,7 @@ GameObject:
   - component: {fileID: 1252444966}
   - component: {fileID: 1252444965}
   - component: {fileID: 1252444964}
+  - component: {fileID: 1252444967}
   m_Layer: 6
   m_Name: PusherProxy
   m_TagString: Sorter
@@ -1297,6 +1325,33 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1252444962}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!54 &1252444967
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1252444962}
+  serializedVersion: 5
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 0
+  m_IsKinematic: 1
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1 &1385162961
 GameObject:
   m_ObjectHideFlags: 0
