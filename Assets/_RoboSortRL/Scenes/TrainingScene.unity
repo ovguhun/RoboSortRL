@@ -534,6 +534,62 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 285511372}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &296514133
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 296514134}
+  - component: {fileID: 296514135}
+  m_Layer: 0
+  m_Name: ProductSpawner
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &296514134
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 296514133}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 673723108}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &296514135
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 296514133}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f8f17c519018bd04491a9b7399b9e59c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RoboSortRL.Simulation.ProductSpawner
+  productPrefab: {fileID: 5304362055784896287, guid: 53888da23dba7254294ba1995a5b99a8, type: 3}
+  spawnPoint: {fileID: 327863260}
+  productContainer: {fileID: 390952255}
+  spawnOnStart: 1
+  autoSpawn: 1
+  spawnIntervalSeconds: 2.5
+  defectProbability: 0.5
+  useFixedSeed: 1
+  randomSeed: 42
+  conveyorSpeed: 1.25
+  conveyorDirection: {x: 0, y: 0, z: 1}
+  maxActiveProducts: 1
 --- !u!1 &327863259
 GameObject:
   m_ObjectHideFlags: 0
@@ -769,6 +825,7 @@ GameObject:
   - component: {fileID: 557328575}
   - component: {fileID: 557328574}
   - component: {fileID: 557328573}
+  - component: {fileID: 557328576}
   m_Layer: 8
   m_Name: RejectZoneTrigger
   m_TagString: RejectZone
@@ -869,6 +926,20 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 557328571}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &557328576
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 557328571}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9ca300dec77128498115d2906bbb20d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RoboSortRL.Simulation.AcceptRejectZone
+  zoneType: 1
+  logEvents: 0
 --- !u!1 &642439797
 GameObject:
   m_ObjectHideFlags: 0
@@ -930,7 +1001,10 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 296514134}
+  - {fileID: 1588686539}
+  - {fileID: 1385162962}
   m_Father: {fileID: 1987818484}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &785505700
@@ -1223,6 +1297,55 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1252444962}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &1385162961
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1385162962}
+  - component: {fileID: 1385162963}
+  m_Layer: 0
+  m_Name: SortingEventRouter
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1385162962
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1385162961}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 673723108}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1385162963
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1385162961}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 60b973b87beecc6459bebed9cdbefafb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RoboSortRL.Simulation.SortingEventRouter
+  acceptZone: {fileID: 1485345517}
+  rejectZone: {fileID: 557328576}
+  episodeStats: {fileID: 1588686538}
+  productSpawner: {fileID: 296514135}
+  despawnProcessedProducts: 1
 --- !u!1 &1400141625
 GameObject:
   m_ObjectHideFlags: 0
@@ -1490,6 +1613,7 @@ GameObject:
   - component: {fileID: 1485345516}
   - component: {fileID: 1485345515}
   - component: {fileID: 1485345514}
+  - component: {fileID: 1485345517}
   m_Layer: 8
   m_Name: AcceptZoneTrigger
   m_TagString: AcceptZone
@@ -1590,6 +1714,68 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1485345512}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1485345517
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1485345512}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9ca300dec77128498115d2906bbb20d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RoboSortRL.Simulation.AcceptRejectZone
+  zoneType: 0
+  logEvents: 0
+--- !u!1 &1588686537
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1588686539}
+  - component: {fileID: 1588686538}
+  m_Layer: 0
+  m_Name: EpisodeStats
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1588686538
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1588686537}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94152f596728f9241bd26df39df6fe70, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RoboSortRL.Simulation.EpisodeStats
+  goodAccepted: 0
+  defectRejected: 0
+  goodRejected: 0
+  defectMissed: 0
+--- !u!4 &1588686539
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1588686537}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 673723108}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1600084090
 GameObject:
   m_ObjectHideFlags: 0
