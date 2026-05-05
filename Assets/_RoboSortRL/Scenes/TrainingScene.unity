@@ -951,6 +951,7 @@ GameObject:
   - component: {fileID: 642439798}
   - component: {fileID: 642439799}
   - component: {fileID: 642439800}
+  - component: {fileID: 642439801}
   m_Layer: 0
   m_Name: SorterProxy
   m_TagString: Untagged
@@ -1018,6 +1019,32 @@ MonoBehaviour:
   carriageInput: 0
   extensionInput: 0
   pushStrengthInput: -1
+--- !u!114 &642439801
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 642439797}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ce09edbaf583b5546a62595240479a7b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RoboSortRL.Simulation.SorterProductPusher
+  sorterController: {fileID: 642439799}
+  pusherProxy: {fileID: 1252444963}
+  sortingZone: {fileID: 459200407}
+  rejectDirectionReference: {fileID: 1790665031}
+  minExtensionAmount: 0.2
+  minPushStrength: 0.5
+  pushSpeed: 3
+  pushVolumeLocalOffset: {x: 0.55, y: 0, z: 0}
+  pushVolumeHalfExtents: {x: 1.35, y: 0.35, z: 0.55}
+  productLayerMask:
+    serializedVersion: 2
+    m_Bits: 128
+  drawDebugGizmos: 1
+  productsPushedThisFrame: 0
 --- !u!1 &673723107
 GameObject:
   m_ObjectHideFlags: 0
