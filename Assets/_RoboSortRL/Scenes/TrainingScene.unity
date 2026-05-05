@@ -581,7 +581,7 @@ MonoBehaviour:
   productPrefab: {fileID: 5304362055784896287, guid: 53888da23dba7254294ba1995a5b99a8, type: 3}
   spawnPoint: {fileID: 327863260}
   productContainer: {fileID: 390952255}
-  spawnOnStart: 1
+  spawnOnStart: 0
   autoSpawn: 0
   spawnIntervalSeconds: 2.5
   defectProbability: 0.5
@@ -1077,6 +1077,7 @@ Transform:
   - {fileID: 296514134}
   - {fileID: 1588686539}
   - {fileID: 1385162962}
+  - {fileID: 1403137445}
   m_Father: {fileID: 1987818484}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &785505700
@@ -1477,6 +1478,56 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1987818484}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1403137444
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1403137445}
+  - component: {fileID: 1403137446}
+  m_Layer: 0
+  m_Name: EpisodeManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1403137445
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1403137444}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 673723108}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1403137446
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1403137444}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4216948eff038f14c9113b6522e07a55, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RoboSortRL.Simulation.EpisodeManager
+  productSpawner: {fileID: 296514135}
+  episodeStats: {fileID: 1588686538}
+  sorterController: {fileID: 642439799}
+  beginEpisodeOnStart: 1
+  spawnProductOnEpisodeBegin: 1
+  episodeIndex: 0
 --- !u!1 &1439470783
 GameObject:
   m_ObjectHideFlags: 0
