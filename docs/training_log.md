@@ -294,3 +294,50 @@ The model again stabilized around `0.74–0.76` mean reward, suggesting the curr
 ### Known Limitation
 
 Training was manually interrupted after confirming stable learning progress and ONNX export. This run is useful evidence for parallel training, but it is not yet a final convergence/hyperparameter comparison run.
+
+---
+
+## Run: RoboSort_PPO_LargeNet_StatsCheck_001
+
+**Date:** 2026-05-06  
+**Scene:** TrainingScene_Parallel8  
+**Behavior Name:** RoboSort  
+**Algorithm:** PPO  
+**Config:** `config/robosort_ppo_large.yaml`  
+**Environment setup:** 8 prefab-based parallel sorting cells in one Unity scene  
+**Observation setup:** 13 vector observations + RayPerceptionSensor3D  
+**Action setup:** 3 continuous actions  
+**Decision Period:** 5  
+
+### Result Summary
+
+This was a short verification run after adding custom ML-Agents `StatsRecorder` metrics to `SortingEventRouter`.
+
+| Step | Mean Reward | Std Reward |
+|---:|---:|---:|
+| 10,000 | -0.413 | 0.992 |
+| 20,000 | -0.315 | 1.003 |
+| 30,000 | -0.016 | 0.966 |
+| 40,000 | 0.176 | 0.910 |
+| 50,000 | 0.453 | 0.698 |
+
+### Checkpoints Exported
+
+- `RoboSort-49955.onnx`
+- `RoboSort-57442.onnx`
+- Final copied model: `results/RoboSort_PPO_LargeNet_StatsCheck_001/RoboSort.onnx`
+
+### TensorBoard Stats Verified
+
+The TensorBoard event file contains the custom sorting diagnostics:
+
+- `RoboSort/TotalOutcomes`
+- `RoboSort/Accuracy`
+- `RoboSort/DefectRejected`
+- `RoboSort/GoodRejected`
+- `RoboSort/DefectMissed`
+- `RoboSort/GoodAccepted`
+
+### Interpretation
+
+The custom outcome counters are successfully written to TensorBoard. Future PPO runs can now be analyzed by reward trend, sorting accuracy, and per-outcome failure mode.
