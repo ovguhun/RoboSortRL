@@ -17,7 +17,16 @@ namespace RoboSortRL.Simulation
         [SerializeField] private bool spawnOnStart = true;
         [SerializeField] private bool autoSpawn = false;
         [SerializeField] private float spawnIntervalSeconds = 2.5f;
+
+        [Tooltip("Probability that a spawned product is defective. 0.5 means balanced good/defective products.")]
         [SerializeField, Range(0f, 1f)] private float defectProbability = 0.5f;
+
+        [Header("Spawn Randomization")]
+        [Tooltip("If enabled, each product spawns with a random lateral offset along the spawn point's right vector.")]
+        [SerializeField] private bool randomizeSpawnX = false;
+
+        [Tooltip("Maximum absolute lateral offset from the spawn point.")]
+        [SerializeField, Min(0f)] private float spawnXRange = 0.35f;
 
         [Header("Reproducibility")]
         [SerializeField] private bool useFixedSeed = false;
@@ -28,7 +37,7 @@ namespace RoboSortRL.Simulation
         [SerializeField] private Vector3 conveyorDirection = Vector3.forward;
 
         [Header("Safety")]
-        [SerializeField] private int maxActiveProducts = 1;
+        [SerializeField, Min(1)] private int maxActiveProducts = 1;
 
         private readonly List<Product> activeProducts = new List<Product>();
         private System.Random rng;
@@ -111,7 +120,7 @@ namespace RoboSortRL.Simulation
 
             GameObject productObject = Instantiate(
                 productPrefab,
-                spawnPoint.position,
+                GetSpawnPosition(),
                 spawnPoint.rotation,
                 parent
             );
@@ -133,8 +142,10 @@ namespace RoboSortRL.Simulation
             }
 
             product.Initialize(productType);
-            mover.Initialize(conveyorSpeed, conveyorDirection);
+
+            mover.LifetimeExpired -= HandleProductLifetimeExpired;
             mover.LifetimeExpired += HandleProductLifetimeExpired;
+            mover.Initialize(conveyorSpeed, conveyorDirection);
 
             activeProducts.Add(product);
 
@@ -178,6 +189,22 @@ namespace RoboSortRL.Simulation
             rng = useFixedSeed
                 ? new System.Random(randomSeed)
                 : new System.Random(Guid.NewGuid().GetHashCode());
+        }
+
+        private Vector3 GetSpawnPosition()
+        {
+            if (!randomizeSpawnX || spawnXRange <= 0f)
+            {
+                return spawnPoint.position;
+            }
+
+            float randomOffsetX = Mathf.Lerp(
+                -spawnXRange,
+                spawnXRange,
+                (float)rng.NextDouble()
+            );
+
+            return spawnPoint.position + spawnPoint.right * randomOffsetX;
         }
 
         private void SafelyDestroyProduct(Product product)
