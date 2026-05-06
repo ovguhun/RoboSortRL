@@ -17,11 +17,11 @@ namespace RoboSortRL.Agents
     /// This agent does not move products or transforms directly.
     /// It controls the sorter only through SorterController.SetControl().
     ///
-    /// First version:
-    /// - Vector observations only.
+    /// Current version:
+    /// - Vector observations plus RayPerceptionSensor3D.
     /// - 3 continuous actions.
     /// - Event-based rewards through SortingEventRouter.SortingOutcomeRouted.
-    /// - RayPerceptionSensor3D will be added later after this path is stable.
+    /// - Optional Reward V2 support is available but disabled by default.
     /// </summary>
     public class RoboSortAgent : Agent
     {
@@ -30,6 +30,9 @@ namespace RoboSortRL.Agents
         private const int SorterObservationCount = 3;
         private const int TotalVectorObservationCount = 1 + ProductObservationCount + SorterObservationCount;
         private const string DecisionsAtOutcomeStat = "RoboSort/DecisionsAtOutcome";
+        private const string SpeedBonusStat = "RoboSort/SpeedBonus";
+        private const string NoProductPushPenaltyStat = "RoboSort/NoProductPushPenalty";
+        private const string GoodProductPushPenaltyStat = "RoboSort/GoodProductPushPenalty";
 
         [Header("Scene References")]
         [SerializeField] private EpisodeManager episodeManager;
@@ -55,6 +58,15 @@ namespace RoboSortRL.Agents
         [SerializeField] private float incorrectSortPenalty = -1f;
         [SerializeField] private float timePenaltyPerDecision = -0.001f;
         [SerializeField] private bool endEpisodeOnSortingOutcome = true;
+
+        [Header("Reward V2")]
+        [SerializeField] private bool useRewardV2 = false;
+        [SerializeField] private float correctSortSpeedBonus = 0.1f;
+        [SerializeField] private int targetDecisionsForMaxSpeedBonus = 300;
+        [SerializeField] private float noProductPushPenalty = -0.005f;
+        [SerializeField] private float goodProductPushPenalty = -0.005f;
+        [SerializeField] private float pushPenaltyThreshold = 0.5f;
+        [SerializeField] private float extensionPenaltyThreshold = 0.2f;
 
         [Header("Debug")]
         [SerializeField] private bool hasOutcomeThisEpisode;
@@ -149,6 +161,8 @@ namespace RoboSortRL.Agents
             {
                 AddReward(timePenaltyPerDecision);
             }
+
+            ApplyPushDisciplinePenalty(pushStrengthInput);
         }
 
         public override void Heuristic(in ActionBuffers actionsOut)
@@ -306,7 +320,7 @@ namespace RoboSortRL.Agents
             {
                 case SortingOutcome.GoodAccepted:
                 case SortingOutcome.DefectRejected:
-                    return correctSortReward;
+                    return correctSortReward + GetCorrectSortSpeedBonus();
 
                 case SortingOutcome.GoodRejected:
                 case SortingOutcome.DefectMissed:
@@ -314,6 +328,59 @@ namespace RoboSortRL.Agents
 
                 default:
                     return 0f;
+            }
+        }
+
+        private float GetCorrectSortSpeedBonus()
+        {
+            if (!useRewardV2 || correctSortSpeedBonus <= 0f || targetDecisionsForMaxSpeedBonus <= 0)
+            {
+                return 0f;
+            }
+
+            float normalizedDelay = Mathf.Clamp01((float)decisionsThisEpisode / targetDecisionsForMaxSpeedBonus);
+            float speedFactor = 1f - normalizedDelay;
+            float bonus = correctSortSpeedBonus * speedFactor;
+
+            // Records average speed bonus for correct sorting outcomes only.
+            Academy.Instance.StatsRecorder.Add(SpeedBonusStat, bonus, StatAggregationMethod.Average);
+
+            return bonus;
+        }
+
+        private void ApplyPushDisciplinePenalty(float pushStrengthInput)
+        {
+            if (!useRewardV2)
+            {
+                return;
+            }
+
+            if (pushStrengthInput <= pushPenaltyThreshold)
+            {
+                return;
+            }
+
+            if (sorterController == null || sorterController.ExtensionAmount < extensionPenaltyThreshold)
+            {
+                return;
+            }
+
+            Product currentProduct = productSpawner != null ? productSpawner.CurrentProduct : null;
+            bool hasProduct = currentProduct != null
+                              && currentProduct.gameObject.activeInHierarchy
+                              && !currentProduct.HasBeenProcessed;
+
+            if (!hasProduct || !IsInsideSortingZone(currentProduct.transform.position))
+            {
+                AddReward(noProductPushPenalty);
+                Academy.Instance.StatsRecorder.Add(NoProductPushPenaltyStat, 1f, StatAggregationMethod.Sum);
+                return;
+            }
+
+            if (!currentProduct.IsDefective)
+            {
+                AddReward(goodProductPushPenalty);
+                Academy.Instance.StatsRecorder.Add(GoodProductPushPenaltyStat, 1f, StatAggregationMethod.Sum);
             }
         }
 
