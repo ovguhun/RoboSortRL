@@ -36,6 +36,16 @@ namespace RoboSortRL.Simulation
         [SerializeField] private float conveyorSpeed = 1.25f;
         [SerializeField] private Vector3 conveyorDirection = Vector3.forward;
 
+        [Header("Conveyor Randomization")]
+        [Tooltip("If enabled, each spawned product receives a random conveyor speed.")]
+        [SerializeField] private bool randomizeConveyorSpeed = false;
+
+        [Tooltip("Minimum conveyor speed used when conveyor speed randomization is enabled.")]
+        [SerializeField, Min(0f)] private float minConveyorSpeed = 1.0f;
+
+        [Tooltip("Maximum conveyor speed used when conveyor speed randomization is enabled.")]
+        [SerializeField, Min(0f)] private float maxConveyorSpeed = 1.6f;
+
         [Header("Safety")]
         [SerializeField, Min(1)] private int maxActiveProducts = 1;
 
@@ -145,7 +155,7 @@ namespace RoboSortRL.Simulation
 
             mover.LifetimeExpired -= HandleProductLifetimeExpired;
             mover.LifetimeExpired += HandleProductLifetimeExpired;
-            mover.Initialize(conveyorSpeed, conveyorDirection);
+            mover.Initialize(GetConveyorSpeed(), conveyorDirection);
 
             activeProducts.Add(product);
 
@@ -205,6 +215,28 @@ namespace RoboSortRL.Simulation
             );
 
             return spawnPoint.position + spawnPoint.right * randomOffsetX;
+        }
+
+        private float GetConveyorSpeed()
+        {
+            if (!randomizeConveyorSpeed)
+            {
+                return conveyorSpeed;
+            }
+
+            float minSpeed = Mathf.Min(minConveyorSpeed, maxConveyorSpeed);
+            float maxSpeed = Mathf.Max(minConveyorSpeed, maxConveyorSpeed);
+
+            if (Mathf.Approximately(minSpeed, maxSpeed))
+            {
+                return minSpeed;
+            }
+
+            return Mathf.Lerp(
+                minSpeed,
+                maxSpeed,
+                (float)rng.NextDouble()
+            );
         }
 
         private void SafelyDestroyProduct(Product product)
