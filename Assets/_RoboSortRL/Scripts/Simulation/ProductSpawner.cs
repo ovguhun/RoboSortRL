@@ -37,6 +37,13 @@ namespace RoboSortRL.Simulation
         public int ActiveProductCount => activeProducts.Count;
         public IReadOnlyList<Product> ActiveProducts => activeProducts;
 
+        /// <summary>
+        /// Returns the single active product used by the current training setup.
+        /// This is intended for the one-product-at-a-time environment where maxActiveProducts is 1.
+        /// If multi-product training is added later, use ActiveProducts and define product-selection logic explicitly.
+        /// </summary>
+        public Product CurrentProduct => activeProducts.Count > 0 ? activeProducts[0] : null;
+
         private void Awake()
         {
             InitializeRng();
