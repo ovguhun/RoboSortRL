@@ -176,3 +176,58 @@ This confirms that prefab-based scene-level parallelism is working and is suitab
 ### Known Limitation
 
 This was a smoke test, not a full convergence run. Training was manually interrupted after confirming learning progress and ONNX export.
+
+---
+
+## Run: RoboSort_PPO_Parallel4_Smoke_001
+
+**Date:** 2026-05-06  
+**Scene:** TrainingScene_Parallel  
+**Behavior Name:** RoboSort  
+**Algorithm:** PPO  
+**Config:** `config/robosort_ppo_ray.yaml`  
+**Environment setup:** 4 prefab-based parallel sorting cells in one Unity scene  
+**Observation setup:** 13 vector observations + RayPerceptionSensor3D  
+**Action setup:** 3 continuous actions  
+**Decision Period:** 5  
+**Torch:** 2.2.2+cpu  
+**ML-Agents Python:** 1.1.0  
+**Unity ML-Agents package:** 4.0.3  
+
+### Result Summary
+
+This was the first PPO smoke test using the 4-cell parallel training scene.
+
+| Step | Mean Reward | Std Reward |
+|---:|---:|---:|
+| 10,000 | -0.244 | 1.007 |
+| 20,000 | -0.352 | 1.019 |
+| 30,000 | -0.004 | 0.967 |
+| 40,000 | 0.123 | 0.934 |
+| 50,000 | 0.212 | 0.870 |
+| 60,000 | 0.578 | 0.539 |
+| 70,000 | 0.674 | 0.349 |
+| 80,000 | 0.691 | 0.278 |
+| 90,000 | 0.688 | 0.267 |
+| 100,000 | 0.715 | 0.086 |
+
+### Checkpoints Exported
+
+- `RoboSort-49968.onnx`
+- `RoboSort-99997.onnx`
+- `RoboSort-105210.onnx`
+- Final copied model: `results/RoboSort_PPO_Parallel4_Smoke_001/RoboSort.onnx`
+
+### Interpretation
+
+The 4-cell parallel training scene is valid. Multiple prefab-based RoboSort agents trained under the shared `RoboSort` behavior and produced successful TensorBoard and ONNX outputs.
+
+The run reached 100k steps in about 130 seconds, which is a major throughput improvement over the single-cell Editor runs.
+
+### Follow-up Fix
+
+After this smoke test, `ProductSpawner.useFixedSeed` was disabled on `SortingCell.prefab` so future parallel runs do not use identical fixed random sequences across cells.
+
+### Known Limitation
+
+This was a smoke test, not a full convergence run. Training was manually interrupted after confirming learning progress and ONNX export.
