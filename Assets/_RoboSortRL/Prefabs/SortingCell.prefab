@@ -648,11 +648,14 @@ MonoBehaviour:
   spawnIntervalSeconds: 2.5
   defectProbability: 0.5
   randomizeSpawnX: 1
-  spawnXRange: 0.35
+  spawnXRange: 0.5
   useFixedSeed: 0
   randomSeed: 42
   conveyorSpeed: 1.25
   conveyorDirection: {x: 0, y: 0, z: 1}
+  randomizeConveyorSpeed: 1
+  minConveyorSpeed: 1
+  maxConveyorSpeed: 1.6
   maxActiveProducts: 1
 --- !u!1 &2827748878913790597
 GameObject:
