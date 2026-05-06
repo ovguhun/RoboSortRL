@@ -439,3 +439,55 @@ This confirms that the current policy is solving the task correctly. Future impr
 ### Reward v2 Calibration Note
 
 The earlier idea of `targetDecisionsForMaxSpeedBonus = 40` is too aggressive for the current environment. A safer first Reward v2 value is around `300`, with a small speed bonus such as `0.1`.
+
+---
+
+## Run: RoboSort_PPO_HardenedSpawnSpeed_001
+
+**Date:** 2026-05-06  
+**Scene:** TrainingScene_Parallel8  
+**Behavior Name:** RoboSort  
+**Algorithm:** PPO  
+**Config:** `config/robosort_ppo_large.yaml`  
+**Environment setup:** 8 prefab-based parallel sorting cells  
+**Task hardening:** spawn X randomized to `±0.50`, conveyor speed randomized from `1.0` to `1.6`  
+**Observation setup:** 13 vector observations + RayPerceptionSensor3D  
+**Action setup:** 3 continuous actions  
+**Decision Period:** 5  
+
+### Result Summary
+
+This was the first PPO run after hardening the task with randomized product spawn position and randomized conveyor speed.
+
+| Step | Mean Reward | Std Reward |
+|---:|---:|---:|
+| 50,000 | 0.438 | 0.728 |
+| 100,000 | 0.734 | 0.222 |
+| 150,000 | 0.749 | 0.180 |
+| 200,000 | 0.757 | 0.106 |
+| 250,000 | 0.750 | 0.110 |
+| 300,000 | 0.761 | 0.108 |
+| 400,000 | 0.763 | 0.102 |
+| 410,000 | 0.754 | 0.106 |
+
+### TensorBoard Outcome Diagnosis
+
+Late-stage TensorBoard stats showed that the hardened task was still solved reliably:
+
+- `RoboSort/Accuracy` was `1.0000` in most final windows.
+- One late-stage window dipped slightly to `0.9951` at 340k due to a single `DefectMissed`.
+- `RoboSort/DecisionsAtOutcome` remained around `240–251`.
+- `GoodAccepted + DefectRejected` matched `TotalOutcomes` in most final windows.
+
+### Interpretation
+
+The randomized spawn and conveyor speed made early learning noisier, but the agent still solved the task reliably by roughly 100k–120k steps.
+
+The reward plateau around `0.75` remains explained by time penalty rather than sorting failure:
+
+- Correct outcome reward is about `+1.0`.
+- The agent takes about `240–250` decisions before outcome.
+- Time penalty is `-0.001` per decision.
+- Expected reward remains around `0.75`.
+
+This confirms the environment is more robust and randomized than the original baseline, but it is still not difficult enough to require long training. Further complexity should come from calibrated Reward v2, stronger randomization, or a future third product/third-zone task extension.
