@@ -341,3 +341,57 @@ The TensorBoard event file contains the custom sorting diagnostics:
 ### Interpretation
 
 The custom outcome counters are successfully written to TensorBoard. Future PPO runs can now be analyzed by reward trend, sorting accuracy, and per-outcome failure mode.
+
+---
+
+## Run: RoboSort_PPO_LargeNet_Stats_001
+
+**Date:** 2026-05-06  
+**Scene:** TrainingScene_Parallel8  
+**Behavior Name:** RoboSort  
+**Algorithm:** PPO  
+**Config:** `config/robosort_ppo_large.yaml`  
+**Environment setup:** 8 prefab-based parallel sorting cells in one Unity scene  
+**Observation setup:** 13 vector observations + RayPerceptionSensor3D  
+**Action setup:** 3 continuous actions  
+**Decision Period:** 5  
+
+### Result Summary
+
+This was the first longer 8-cell PPO run after enabling custom TensorBoard outcome diagnostics.
+
+| Step | Mean Reward | Std Reward |
+|---:|---:|---:|
+| 50,000 | 0.463 | 0.692 |
+| 100,000 | 0.733 | 0.166 |
+| 150,000 | 0.745 | 0.100 |
+| 200,000 | 0.733 | 0.169 |
+| 250,000 | 0.757 | 0.102 |
+| 300,000 | 0.760 | 0.102 |
+
+### Checkpoints Exported
+
+- `RoboSort-49951.onnx`
+- `RoboSort-99947.onnx`
+- `RoboSort-149952.onnx`
+- `RoboSort-199932.onnx`
+- `RoboSort-249933.onnx`
+- `RoboSort-299987.onnx`
+- `RoboSort-309698.onnx`
+- Final copied model: `results/RoboSort_PPO_LargeNet_Stats_001/RoboSort.onnx`
+
+### TensorBoard Outcome Diagnosis
+
+Custom TensorBoard stats showed that the late-stage policy reached perfect sorting accuracy in the final logged windows.
+
+From 210k to 300k steps:
+
+- `RoboSort/Accuracy` remained at `1.0000`.
+- `RoboSort/GoodRejected` produced no new late-stage errors.
+- `RoboSort/DefectMissed` produced no new late-stage errors.
+- `GoodAccepted + DefectRejected = TotalOutcomes` in the final windows.
+
+This means the observed reward plateau around `0.74–0.76` is not caused by incorrect sorting. It is most likely caused by accumulated time penalty before the final sorting outcome.
+
+This changes the interpretation of the baseline: the agent is not merely around 90% accurate. In the late-stage TensorBoard windows, it reaches effectively 100% sorting accuracy under the current task setup.
+
