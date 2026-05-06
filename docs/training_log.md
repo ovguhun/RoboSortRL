@@ -124,3 +124,55 @@ Training was manually interrupted around 129,256 steps using Ctrl+C after confir
 
 The ray-enabled run is valid, but it does not yet prove a major performance advantage because the current environment is still relatively easy.
 
+
+---
+
+## Run: RoboSort_PPO_Parallel2_Smoke_001
+
+**Date:** 2026-05-06  
+**Scene:** TrainingScene_Parallel  
+**Behavior Name:** RoboSort  
+**Algorithm:** PPO  
+**Config:** `config/robosort_ppo_ray.yaml`  
+**Environment setup:** 2 parallel sorting cells in one Unity scene  
+**Observation setup:** 13 vector observations + RayPerceptionSensor3D  
+**Action setup:** 3 continuous actions  
+**Decision Period:** 5  
+**Torch:** 2.2.2+cpu  
+**ML-Agents Python:** 1.1.0  
+**Unity ML-Agents package:** 4.0.3  
+
+### Result Summary
+
+This was the first PPO smoke test using the duplicated prefab-based parallel training scene.
+
+The run confirmed that multiple RoboSort agents can train under the same shared `RoboSort` behavior in one Unity scene.
+
+| Step | Mean Reward | Std Reward |
+|---:|---:|---:|
+| 10,000 | -0.407 | 1.004 |
+| 20,000 | -0.356 | 1.008 |
+| 30,000 | -0.076 | 0.971 |
+| 40,000 | 0.102 | 0.938 |
+| 50,000 | 0.515 | 0.617 |
+
+### Checkpoints Exported
+
+- `RoboSort-49954.onnx`
+- `RoboSort-57875.onnx`
+- Final copied model: `results/RoboSort_PPO_Parallel2_Smoke_001/RoboSort.onnx`
+
+### Interpretation
+
+The 2-cell parallel scene is valid. Both cells used the same behavior name, trained under the same PPO policy, and produced successful TensorBoard and ONNX outputs.
+
+The 2-cell setup improved sample throughput compared with the single-cell RayPerception run:
+
+- Single-cell Ray run reached 50k steps in about 161 seconds.
+- 2-cell smoke run reached 50k steps in about 95 seconds.
+
+This confirms that prefab-based scene-level parallelism is working and is suitable for scaling to more cells.
+
+### Known Limitation
+
+This was a smoke test, not a full convergence run. Training was manually interrupted after confirming learning progress and ONNX export.
