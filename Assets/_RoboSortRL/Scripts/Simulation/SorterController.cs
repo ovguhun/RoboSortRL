@@ -116,9 +116,19 @@ namespace RoboSortRL.Simulation
         /// </summary>
         public void SetControl(float carriageInput, float extensionInput, float pushStrengthInput)
         {
-            requestedCarriageInput = Mathf.Clamp(carriageInput, -1f, 1f);
-            requestedExtensionInput = Mathf.Clamp(extensionInput, -1f, 1f);
-            requestedPushStrengthInput = Mathf.Clamp(pushStrengthInput, -1f, 1f);
+            requestedCarriageInput = SanitizeActionInput(carriageInput, 0f);
+            requestedExtensionInput = SanitizeActionInput(extensionInput, 0f);
+            requestedPushStrengthInput = SanitizeActionInput(pushStrengthInput, -1f);
+        }
+
+        private static float SanitizeActionInput(float value, float fallback)
+        {
+            if (float.IsNaN(value) || float.IsInfinity(value))
+            {
+                return fallback;
+            }
+
+            return Mathf.Clamp(value, -1f, 1f);
         }
 
         /// <summary>
