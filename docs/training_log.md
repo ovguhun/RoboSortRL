@@ -395,3 +395,47 @@ This means the observed reward plateau around `0.74–0.76` is not caused by inc
 
 This changes the interpretation of the baseline: the agent is not merely around 90% accurate. In the late-stage TensorBoard windows, it reaches effectively 100% sorting accuracy under the current task setup.
 
+
+---
+
+## Run: RoboSort_PPO_DecisionTiming_001
+
+**Date:** 2026-05-06  
+**Scene:** TrainingScene_Parallel8  
+**Behavior Name:** RoboSort  
+**Algorithm:** PPO  
+**Config:** `config/robosort_ppo_large.yaml`  
+**Environment setup:** 8 prefab-based parallel sorting cells in one Unity scene  
+**Observation setup:** 13 vector observations + RayPerceptionSensor3D  
+**Action setup:** 3 continuous actions  
+**Decision Period:** 5  
+
+### Result Summary
+
+This run measured `RoboSort/DecisionsAtOutcome` after adding decision-timing diagnostics to `RoboSortAgent`.
+
+The agent again reached perfect late-stage sorting accuracy, while cumulative reward stayed around `0.74–0.76`.
+
+### Late-Stage TensorBoard Diagnosis
+
+From 560k to 650k steps:
+
+- `RoboSort/Accuracy` stayed at `1.0000`.
+- `RoboSort/DecisionsAtOutcome` stayed roughly between `244` and `271`.
+- `RoboSort/GoodRejected` had no late-stage errors.
+- `RoboSort/DefectMissed` had no late-stage errors.
+
+### Interpretation
+
+The reward plateau is explained by the time penalty:
+
+- Correct sorting outcome gives about `+1.0`.
+- The agent takes about `250` decisions before outcome.
+- Time penalty is `-0.001` per decision.
+- Expected reward is therefore about `1.0 - 0.25 = 0.75`.
+
+This confirms that the current policy is solving the task correctly. Future improvement should focus on task hardening and calibrated Reward v2, not repeated PPO runs on the same easy setup.
+
+### Reward v2 Calibration Note
+
+The earlier idea of `targetDecisionsForMaxSpeedBonus = 40` is too aggressive for the current environment. A safer first Reward v2 value is around `300`, with a small speed bonus such as `0.1`.
