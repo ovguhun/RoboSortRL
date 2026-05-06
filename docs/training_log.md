@@ -231,3 +231,66 @@ After this smoke test, `ProductSpawner.useFixedSeed` was disabled on `SortingCel
 ### Known Limitation
 
 This was a smoke test, not a full convergence run. Training was manually interrupted after confirming learning progress and ONNX export.
+
+---
+
+## Run: RoboSort_PPO_Parallel8_Smoke_001
+
+**Date:** 2026-05-06  
+**Scene:** TrainingScene_Parallel8  
+**Behavior Name:** RoboSort  
+**Algorithm:** PPO  
+**Config:** `config/robosort_ppo_ray.yaml`  
+**Environment setup:** 8 prefab-based parallel sorting cells in one Unity scene  
+**Observation setup:** 13 vector observations + RayPerceptionSensor3D  
+**Action setup:** 3 continuous actions  
+**Decision Period:** 5  
+**Torch:** 2.2.2+cpu  
+**ML-Agents Python:** 1.1.0  
+**Unity ML-Agents package:** 4.0.3  
+
+### Result Summary
+
+This was the first PPO run using the 8-cell parallel training scene.
+
+| Step | Mean Reward | Std Reward |
+|---:|---:|---:|
+| 10,000 | -0.270 | 1.000 |
+| 20,000 | -0.324 | 1.008 |
+| 30,000 | -0.133 | 0.997 |
+| 40,000 | -0.087 | 0.997 |
+| 50,000 | 0.246 | 0.852 |
+| 60,000 | 0.604 | 0.498 |
+| 70,000 | 0.676 | 0.350 |
+| 80,000 | 0.725 | 0.230 |
+| 90,000 | 0.716 | 0.268 |
+| 100,000 | 0.763 | 0.095 |
+| 150,000 | 0.751 | 0.101 |
+| 200,000 | 0.741 | 0.102 |
+| 250,000 | 0.755 | 0.102 |
+| 270,000 | 0.758 | 0.103 |
+
+### Checkpoints Exported
+
+- `RoboSort-99986.onnx`
+- `RoboSort-149937.onnx`
+- `RoboSort-199959.onnx`
+- `RoboSort-249989.onnx`
+- `RoboSort-273190.onnx`
+- Final copied model: `results/RoboSort_PPO_Parallel8_Smoke_001/RoboSort.onnx`
+
+### Interpretation
+
+The 8-cell parallel training scene is valid and significantly faster than the previous Editor training runs.
+
+Throughput comparison:
+
+- Single-cell Ray run reached 100k steps in about 315 seconds.
+- 4-cell parallel run reached 100k steps in about 130 seconds.
+- 8-cell parallel run reached 100k steps in about 77 seconds.
+
+The model again stabilized around `0.74–0.76` mean reward, suggesting the current performance ceiling is likely caused by task/reward/episode design rather than insufficient sample throughput.
+
+### Known Limitation
+
+Training was manually interrupted after confirming stable learning progress and ONNX export. This run is useful evidence for parallel training, but it is not yet a final convergence/hyperparameter comparison run.
