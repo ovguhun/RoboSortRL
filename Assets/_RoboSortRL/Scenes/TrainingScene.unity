@@ -1016,7 +1016,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RoboSortRL.Simulation.ManualSorterInput
   sorterController: {fileID: 642439799}
   episodeManager: {fileID: 1403137446}
-  enableManualInput: 1
+  enableManualInput: 0
   carriageInput: 0
   extensionInput: 0
   pushStrengthInput: -1
@@ -1526,7 +1526,7 @@ MonoBehaviour:
   productSpawner: {fileID: 296514135}
   episodeStats: {fileID: 1588686538}
   sorterController: {fileID: 642439799}
-  beginEpisodeOnStart: 1
+  beginEpisodeOnStart: 0
   spawnProductOnEpisodeBegin: 1
   episodeIndex: 0
 --- !u!1 &1439470783

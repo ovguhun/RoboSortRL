@@ -1,9 +1,16 @@
+using System;
 using UnityEngine;
 
 namespace RoboSortRL.Simulation
 {
     public class SortingEventRouter : MonoBehaviour
     {
+        /// <summary>
+        /// Broadcasts every final sorting outcome from both AcceptZone and RejectZone.
+        /// Future reward logic should subscribe here, not directly to AcceptRejectZone.ProductProcessed.
+        /// </summary>
+        public event Action<SortingOutcome, Product, AcceptRejectZone> SortingOutcomeRouted;
+
         [Header("Scene References")]
         [SerializeField] private AcceptRejectZone acceptZone;
         [SerializeField] private AcceptRejectZone rejectZone;
@@ -55,11 +62,13 @@ namespace RoboSortRL.Simulation
         {
             if (acceptZone != null)
             {
+                acceptZone.ProductProcessed -= HandleProductProcessed;
                 acceptZone.ProductProcessed += HandleProductProcessed;
             }
 
             if (rejectZone != null)
             {
+                rejectZone.ProductProcessed -= HandleProductProcessed;
                 rejectZone.ProductProcessed += HandleProductProcessed;
             }
         }
@@ -83,6 +92,8 @@ namespace RoboSortRL.Simulation
             {
                 episodeStats.RegisterOutcome(outcome);
             }
+
+            SortingOutcomeRouted?.Invoke(outcome, product, zone);
 
             if (despawnProcessedProducts && productSpawner != null && product != null)
             {
