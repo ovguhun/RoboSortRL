@@ -35,6 +35,11 @@ summaries/
 .DS_Store
 Thumbs.db
 
+# ML-Agents runtime timer/profiler output generated when entering Play Mode.
+# Not source code, not training config, not a model.
+Assets/ML-Agents/
+Assets/ML-Agents.meta
+
 # Third-party Asset Store content - not redistributed in public GitHub repo
 Assets/UnityFactorySceneHDRP/
 Assets/UnityFactorySceneHDRP.meta
