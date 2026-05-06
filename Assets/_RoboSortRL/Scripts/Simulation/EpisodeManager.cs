@@ -20,7 +20,7 @@ namespace RoboSortRL.Simulation
         [Header("Episode Settings")]
         // For manual Day 5 testing, this can stay true.
         // When RoboSortAgent is added, set this to false and let Agent.OnEpisodeBegin() call BeginEpisode().
-        [SerializeField] private bool beginEpisodeOnStart = true;
+        [SerializeField] private bool beginEpisodeOnStart = false;
         [SerializeField] private bool spawnProductOnEpisodeBegin = true;
 
         [Header("Debug")]
