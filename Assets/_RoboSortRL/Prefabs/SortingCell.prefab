@@ -647,7 +647,7 @@ MonoBehaviour:
   autoSpawn: 0
   spawnIntervalSeconds: 2.5
   defectProbability: 0.5
-  useFixedSeed: 1
+  useFixedSeed: 0
   randomSeed: 42
   conveyorSpeed: 1.25
   conveyorDirection: {x: 0, y: 0, z: 1}
