@@ -647,6 +647,8 @@ MonoBehaviour:
   autoSpawn: 0
   spawnIntervalSeconds: 2.5
   defectProbability: 0.5
+  randomizeSpawnX: 1
+  spawnXRange: 0.35
   useFixedSeed: 0
   randomSeed: 42
   conveyorSpeed: 1.25
@@ -1268,6 +1270,7 @@ MonoBehaviour:
   hasOutcomeThisEpisode: 0
   lastOutcome: 0
   lastOutcomeReward: 0
+  decisionsThisEpisode: 0
 --- !u!114 &2321749556778772900
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1939,6 +1942,7 @@ MonoBehaviour:
   episodeStats: {fileID: 6578601828824004546}
   productSpawner: {fileID: 1313762181496617038}
   despawnProcessedProducts: 1
+  recordTrainingStats: 1
 --- !u!1 &8934820798278998323
 GameObject:
   m_ObjectHideFlags: 0
