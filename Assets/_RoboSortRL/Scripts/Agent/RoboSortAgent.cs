@@ -29,6 +29,7 @@ namespace RoboSortRL.Agents
         private const int ProductObservationCount = 9;
         private const int SorterObservationCount = 3;
         private const int TotalVectorObservationCount = 1 + ProductObservationCount + SorterObservationCount;
+        private const string DecisionsAtOutcomeStat = "RoboSort/DecisionsAtOutcome";
 
         [Header("Scene References")]
         [SerializeField] private EpisodeManager episodeManager;
@@ -59,6 +60,7 @@ namespace RoboSortRL.Agents
         [SerializeField] private bool hasOutcomeThisEpisode;
         [SerializeField] private SortingOutcome lastOutcome;
         [SerializeField] private float lastOutcomeReward;
+        [SerializeField] private int decisionsThisEpisode;
 
         private bool isSubscribedToRouter;
 
@@ -95,6 +97,7 @@ namespace RoboSortRL.Agents
         {
             hasOutcomeThisEpisode = false;
             lastOutcomeReward = 0f;
+            decisionsThisEpisode = 0;
 
             if (episodeManager == null)
             {
@@ -134,6 +137,8 @@ namespace RoboSortRL.Agents
             float carriageInput = continuousActions.Length > 0 ? continuousActions[0] : 0f;
             float extensionInput = continuousActions.Length > 1 ? continuousActions[1] : 0f;
             float pushStrengthInput = continuousActions.Length > 2 ? continuousActions[2] : -1f;
+
+            decisionsThisEpisode++;
 
             if (sorterController != null)
             {
@@ -282,6 +287,12 @@ namespace RoboSortRL.Agents
             float reward = GetRewardForOutcome(outcome);
             lastOutcomeReward = reward;
             AddReward(reward);
+
+            Academy.Instance.StatsRecorder.Add(
+                DecisionsAtOutcomeStat,
+                decisionsThisEpisode,
+                StatAggregationMethod.Average
+            );
 
             if (endEpisodeOnSortingOutcome)
             {
