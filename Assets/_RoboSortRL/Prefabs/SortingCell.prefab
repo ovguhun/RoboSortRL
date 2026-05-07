@@ -1261,6 +1261,7 @@ MonoBehaviour:
   sortingZone: {fileID: 5061076644595942933}
   rejectZone: {fileID: 3147690950918560799}
   acceptZone: {fileID: 1585515646493943201}
+  includeProductTypeObservation: 0
   lateralPositionNormalization: 3
   longitudinalPositionNormalization: 6
   velocityNormalization: 6
@@ -1270,6 +1271,13 @@ MonoBehaviour:
   incorrectSortPenalty: -1
   timePenaltyPerDecision: -0.001
   endEpisodeOnSortingOutcome: 1
+  useRewardV2: 0
+  correctSortSpeedBonus: 0.1
+  targetDecisionsForMaxSpeedBonus: 300
+  noProductPushPenalty: -0.005
+  goodProductPushPenalty: -0.005
+  pushPenaltyThreshold: 0.5
+  extensionPenaltyThreshold: 0.2
   hasOutcomeThisEpisode: 0
   lastOutcome: 0
   lastOutcomeReward: 0
