@@ -10,6 +10,7 @@ namespace RoboSortRL.Simulation
     ///
     /// This avoids fragile kinematic-vs-kinematic physics impulses and keeps product motion centralized.
     /// </summary>
+    [DefaultExecutionOrder(-200)]
     public class SorterProductPusher : MonoBehaviour
     {
         [Header("References")]
@@ -177,7 +178,13 @@ namespace RoboSortRL.Simulation
 
         private bool IsInsideSortingZone(Vector3 worldPosition)
         {
-            return sortingZone.bounds.Contains(worldPosition);
+            if (sortingZone == null)
+            {
+                return false;
+            }
+
+            Vector3 closestPoint = sortingZone.ClosestPoint(worldPosition);
+            return (closestPoint - worldPosition).sqrMagnitude <= 0.000001f;
         }
 
         private void OnDrawGizmosSelected()

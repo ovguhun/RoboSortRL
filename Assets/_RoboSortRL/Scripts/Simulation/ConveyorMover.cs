@@ -5,6 +5,7 @@ namespace RoboSortRL.Simulation
 {
     [RequireComponent(typeof(Product))]
     [RequireComponent(typeof(Rigidbody))]
+    [DefaultExecutionOrder(-100)]
     public class ConveyorMover : MonoBehaviour
     {
         public event Action<ConveyorMover> LifetimeExpired;

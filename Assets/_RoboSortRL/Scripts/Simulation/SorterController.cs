@@ -19,6 +19,7 @@ namespace RoboSortRL.Simulation
     /// - PusherProxy is moved with Rigidbody.MovePosition in FixedUpdate.
     /// - Product pushing will be scripted later; we do not rely on kinematic-vs-kinematic collision impulses.
     /// </summary>
+    [DefaultExecutionOrder(-300)]
     public class SorterController : MonoBehaviour
     {
         [Header("References")]
