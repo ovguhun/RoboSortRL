@@ -184,7 +184,7 @@ The current final candidate uses controlled randomization on the reusable `Sorti
 | Randomize Conveyor Speed | Enabled |
 | Min Conveyor Speed | `1.0` |
 | Max Conveyor Speed | `1.6` |
-| Defect Probability | `0.5` |
+| Defect Probability | `0.30` final candidate; `0.50` retained as balanced backup/reference |
 | Use Fixed Seed | Disabled |
 
 This makes the task harder while keeping the observation size, action size, rewards, tags, and zone logic stable.

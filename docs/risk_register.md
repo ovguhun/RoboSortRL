@@ -1,4 +1,4 @@
-﻿# Risk Register
+# Risk Register
 
 ## RoboSortRL Pro
 
@@ -48,7 +48,7 @@ This document tracks important technical risks for the RoboSortRL Pro Unity ML-A
 |---|---|---|---|
 | Spawn randomization creates impossible cases | Product may spawn outside reach or off conveyor | Spawn X range limited to `±0.50` and validated in Play Mode | Controlled |
 | Conveyor speed randomization too aggressive | Agent may not have enough time to react | Speed range limited to `1.0–1.6` and validated by PPO run | Controlled |
-| Defect probability too realistic during training | Rare defects could make recall unstable and encourage “always accept” behavior | Training uses balanced `0.5` defect probability; realistic low-defect demos can be separate | Controlled |
+| Defect probability too realistic during training | Rare defects could make recall unstable and encourage “always accept” behavior | Final candidate uses moderate `0.30` defect probability after validation; balanced `0.50` model is retained as backup/reference; avoid rare `0.10`/`0.05` training without curriculum or reward rebalancing | Controlled |
 | Parallel cells share identical random sequences | Reduces training diversity | `useFixedSeed` disabled on `SortingCell.prefab` | Controlled |
 | Prefab overrides drift between cells | Parallel cells may behave inconsistently | Use reusable `SortingCell.prefab`; inspect diffs before committing scene changes | Controlled |
 
