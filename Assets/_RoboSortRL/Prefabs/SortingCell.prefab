@@ -646,7 +646,7 @@ MonoBehaviour:
   spawnOnStart: 0
   autoSpawn: 0
   spawnIntervalSeconds: 2.5
-  defectProbability: 0.5
+  defectProbability: 0.3
   randomizeSpawnX: 1
   spawnXRange: 0.5
   useFixedSeed: 0
