@@ -880,7 +880,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2003528135}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: VisualRoot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
