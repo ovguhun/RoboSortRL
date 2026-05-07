@@ -43,3 +43,6 @@ Assets/ML-Agents.meta
 # Third-party Asset Store content - not redistributed in public GitHub repo
 Assets/UnityFactorySceneHDRP/
 Assets/UnityFactorySceneHDRP.meta
+
+# Local Unity/Chromium crashpad log
+/debug.log
