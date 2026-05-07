@@ -491,3 +491,61 @@ The reward plateau around `0.75` remains explained by time penalty rather than s
 - Expected reward remains around `0.75`.
 
 This confirms the environment is more robust and randomized than the original baseline, but it is still not difficult enough to require long training. Further complexity should come from calibrated Reward v2, stronger randomization, or a future third product/third-zone task extension.
+
+---
+
+## Run: RoboSort_PPO_SensorDrivenType_001
+
+**Date:** 2026-05-07  
+**Branch:** `feature/sensor-driven-product-type`  
+**Scene:** TrainingScene_Parallel8  
+**Behavior Name:** RoboSort  
+**Algorithm:** PPO  
+**Config:** `config/robosort_ppo_large.yaml`  
+**Environment setup:** 8 prefab-based parallel sorting cells  
+**Task hardening:** product type vector observation hidden; policy must rely more on RayPerception tags  
+**Observation setup:** 13 vector observations + RayPerceptionSensor3D  
+**Action setup:** 3 continuous actions  
+**Decision Period:** 5  
+**Max steps:** 1,000,000  
+
+### Result Summary
+
+This was the first full PPO run after disabling the direct product-type vector observation on the SortingCell prefab.
+
+The product-type observation slot remained present to preserve the 13-vector observation size, but it emitted a neutral hidden value instead of directly encoding good vs defective product type.
+
+| Step | Mean Reward | Std Reward |
+|---:|---:|---:|
+| 50,000 | -0.030 | 0.999 |
+| 100,000 | 0.269 | 0.863 |
+| 150,000 | 0.598 | 0.529 |
+| 200,000 | 0.641 | 0.435 |
+| 300,000 | 0.729 | 0.180 |
+| 500,000 | 0.744 | 0.093 |
+| 750,000 | 0.734 | 0.092 |
+| 1,000,000 | 0.713 | 0.171 |
+
+### TensorBoard Outcome Diagnosis
+
+Late-stage TensorBoard stats showed that the sensor-driven task was learnable and mostly solved:
+
+- `RoboSort/Accuracy` stayed at `1.0000` from 910k to 980k.
+- Accuracy dipped slightly to `0.9948` at 990k and `0.9944` at 1,000k.
+- `RoboSort/DecisionsAtOutcome` stayed roughly between `240` and `283`.
+- `GoodRejected` and `DefectMissed` were rare late-stage errors.
+
+### Interpretation
+
+This run confirms that the agent can still solve the task when the direct product-type vector cue is hidden. This makes RayPerception materially more important for the policy and creates a stronger final-project story than the easier direct-type baseline.
+
+The task became meaningfully harder: learning was slower and noisier than the previous hardened spawn/speed task, but PPO still reached near-perfect sorting accuracy.
+
+The reward plateau remains explained by time penalty rather than classification failure:
+
+- Correct outcome reward is about `+1.0`.
+- The agent takes about `240–280` decisions before outcome.
+- Time penalty is `-0.001` per decision.
+- Expected cumulative reward remains around `0.72–0.76`.
+
+This is now a stronger candidate for the final training configuration because it better demonstrates sensor-driven reinforcement learning rather than simple vector-label lookup.
