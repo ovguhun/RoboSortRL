@@ -22,6 +22,7 @@ namespace RoboSortRL.Agents
     /// - 3 continuous actions.
     /// - Event-based rewards through SortingEventRouter.SortingOutcomeRouted.
     /// - Optional Reward V2 support is available but disabled by default.
+    /// - Optional product-type observation hiding is available for sensor-driven training.
     /// </summary>
     public class RoboSortAgent : Agent
     {
@@ -29,10 +30,15 @@ namespace RoboSortRL.Agents
         private const int ProductObservationCount = 9;
         private const int SorterObservationCount = 3;
         private const int TotalVectorObservationCount = 1 + ProductObservationCount + SorterObservationCount;
+
         private const string DecisionsAtOutcomeStat = "RoboSort/DecisionsAtOutcome";
         private const string SpeedBonusStat = "RoboSort/SpeedBonus";
         private const string NoProductPushPenaltyStat = "RoboSort/NoProductPushPenalty";
         private const string GoodProductPushPenaltyStat = "RoboSort/GoodProductPushPenalty";
+
+        private const float NoPushDefault = -1f;
+        private const float HiddenProductTypeObservationValue = 0.5f;
+        private const float ColliderContainmentEpsilon = 0.000001f;
 
         [Header("Scene References")]
         [SerializeField] private EpisodeManager episodeManager;
@@ -45,6 +51,10 @@ namespace RoboSortRL.Agents
         [SerializeField] private Collider sortingZone;
         [SerializeField] private Collider rejectZone;
         [SerializeField] private Collider acceptZone;
+
+        [Header("Observation Hardening")]
+        [Tooltip("If disabled, the product-type vector observation is hidden so the policy must rely more on RayPerception tags.")]
+        [SerializeField] private bool includeProductTypeObservation = true;
 
         [Header("Observation Normalization")]
         [SerializeField] private float lateralPositionNormalization = 3f;
@@ -148,7 +158,7 @@ namespace RoboSortRL.Agents
 
             float carriageInput = continuousActions.Length > 0 ? continuousActions[0] : 0f;
             float extensionInput = continuousActions.Length > 1 ? continuousActions[1] : 0f;
-            float pushStrengthInput = continuousActions.Length > 2 ? continuousActions[2] : -1f;
+            float pushStrengthInput = continuousActions.Length > 2 ? continuousActions[2] : NoPushDefault;
 
             decisionsThisEpisode++;
 
@@ -176,7 +186,7 @@ namespace RoboSortRL.Agents
 
             float carriageInput = 0f;
             float extensionInput = 0f;
-            float pushStrengthInput = -1f;
+            float pushStrengthInput = NoPushDefault;
 
 #if ENABLE_INPUT_SYSTEM
             Keyboard keyboard = Keyboard.current;
@@ -253,11 +263,26 @@ namespace RoboSortRL.Agents
             sensor.AddObservation(ClampUnit(localProductPosition.z / longitudinalPositionNormalization));
             sensor.AddObservation(ClampUnit(localVelocity.x / velocityNormalization));
             sensor.AddObservation(ClampUnit(localVelocity.z / velocityNormalization));
-            sensor.AddObservation(product.IsDefective ? 1f : 0f);
+            sensor.AddObservation(GetProductTypeObservation(product));
             sensor.AddObservation(IsInsideSortingZone(product.transform.position) ? 1f : 0f);
             sensor.AddObservation(GetNormalizedDistanceToCollider(product.transform.position, rejectZone));
             sensor.AddObservation(GetNormalizedDistanceToCollider(product.transform.position, acceptZone));
-            sensor.AddObservation(mover != null ? Mathf.Clamp01(mover.MoveSpeed / conveyorSpeedNormalization) : 0f);
+            sensor.AddObservation(mover != null ? SafeClamp01(mover.MoveSpeed / conveyorSpeedNormalization) : 0f);
+        }
+
+        private float GetProductTypeObservation(Product product)
+        {
+            if (product == null)
+            {
+                return 0f;
+            }
+
+            if (!includeProductTypeObservation)
+            {
+                return HiddenProductTypeObservationValue;
+            }
+
+            return product.IsDefective ? 1f : 0f;
         }
 
         private static void AddEmptyProductObservations(VectorSensor sensor)
@@ -284,8 +309,8 @@ namespace RoboSortRL.Agents
 
             // Sorter observations: SorterObservationCount = 3.
             sensor.AddObservation(ClampUnit(centeredCarriagePosition));
-            sensor.AddObservation(Mathf.Clamp01(sorterController.ExtensionAmount));
-            sensor.AddObservation(Mathf.Clamp01(sorterController.PushStrength));
+            sensor.AddObservation(SafeClamp01(sorterController.ExtensionAmount));
+            sensor.AddObservation(SafeClamp01(sorterController.PushStrength));
         }
 
         private void HandleSortingOutcome(SortingOutcome outcome, Product product, AcceptRejectZone zone)
@@ -386,12 +411,18 @@ namespace RoboSortRL.Agents
 
         private bool IsInsideSortingZone(Vector3 worldPosition)
         {
-            return sortingZone != null && sortingZone.bounds.Contains(worldPosition);
+            if (sortingZone == null)
+            {
+                return false;
+            }
+
+            Vector3 closestPoint = sortingZone.ClosestPoint(worldPosition);
+            return (closestPoint - worldPosition).sqrMagnitude <= ColliderContainmentEpsilon;
         }
 
         private float GetNormalizedDistanceToCollider(Vector3 worldPosition, Collider targetCollider)
         {
-            if (targetCollider == null)
+            if (targetCollider == null || distanceNormalization <= 0f)
             {
                 return 0f;
             }
@@ -399,7 +430,7 @@ namespace RoboSortRL.Agents
             Vector3 closestPoint = targetCollider.ClosestPoint(worldPosition);
             float distance = Vector3.Distance(worldPosition, closestPoint);
 
-            return Mathf.Clamp01(distance / distanceNormalization);
+            return SafeClamp01(distance / distanceNormalization);
         }
 
         private Vector3 ToObservationLocalPosition(Vector3 worldPosition)
@@ -507,6 +538,16 @@ namespace RoboSortRL.Agents
                     this
                 );
             }
+        }
+
+        private static float SafeClamp01(float value)
+        {
+            if (float.IsNaN(value) || float.IsInfinity(value))
+            {
+                return 0f;
+            }
+
+            return Mathf.Clamp01(value);
         }
 
         private static float ClampUnit(float value)
