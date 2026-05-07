@@ -549,3 +549,69 @@ The reward plateau remains explained by time penalty rather than classification 
 - Expected cumulative reward remains around `0.72–0.76`.
 
 This is now a stronger candidate for the final training configuration because it better demonstrates sensor-driven reinforcement learning rather than simple vector-label lookup.
+
+---
+
+## Run: RoboSort_PPO_SensorDrivenType_Defect30_001
+
+**Date:** 2026-05-07  
+**Branch:** `feature/defect-probability-030`  
+**Scene:** TrainingScene_Parallel8  
+**Behavior Name:** RoboSort  
+**Algorithm:** PPO  
+**Config:** `config/robosort_ppo_large.yaml`  
+**Environment setup:** 8 prefab-based parallel sorting cells  
+**Task hardening:** product type vector observation hidden; defect probability reduced from `0.50` to `0.30`  
+**Observation setup:** 13 vector observations + RayPerceptionSensor3D  
+**Action setup:** 3 continuous actions  
+**Decision Period:** 5  
+**Max steps:** 1,000,000  
+
+### Result Summary
+
+This run tested a more realistic class distribution while keeping the sensor-driven product-type setup active.
+
+Compared with the balanced `0.50` defect-probability run, the `0.30` setup learned more slowly and showed more instability before convergence. This is expected because the agent sees fewer defective products and therefore receives fewer reject-learning examples.
+
+| Step | Mean Reward | Std Reward |
+|---:|---:|---:|
+| 50,000 | -0.074 | 0.953 |
+| 100,000 | 0.188 | 0.857 |
+| 200,000 | 0.496 | 0.589 |
+| 300,000 | 0.581 | 0.454 |
+| 500,000 | 0.691 | 0.177 |
+| 750,000 | 0.659 | 0.313 |
+| 900,000 | 0.666 | 0.269 |
+| 1,000,000 | 0.693 | 0.082 |
+
+### TensorBoard Outcome Diagnosis
+
+Late-stage TensorBoard stats showed that the `0.30` defect-probability task was still learnable:
+
+- `RoboSort/Accuracy` was mostly between `0.994` and `1.000` in the final windows.
+- At 1,000,000 steps, `RoboSort/Accuracy` reached `1.0000`.
+- At 1,000,000 steps:
+  - `GoodAccepted = 119`
+  - `DefectRejected = 44`
+  - `GoodRejected = 0`
+  - `DefectMissed = 0`
+  - `TotalOutcomes = 163`
+- `RoboSort/DecisionsAtOutcome` stayed around `286–309` in the final windows.
+
+### Interpretation
+
+The `0.30` defect-probability setup is harder than the balanced `0.50` setup, but PPO still solves it reliably after longer training.
+
+This is a stronger realism-oriented candidate because defects are less frequent while still common enough for stable reinforcement learning. It avoids the major risk of an extremely low defect rate, such as `0.05`, where the agent might learn an unsafe “mostly accept everything” policy.
+
+The lower reward compared with the `0.50` run is not necessarily a failure. The agent takes around `300` decisions before outcome, so the time penalty alone can reduce a correct episode reward to about:
+
+`1.0 - (0.001 × 300) ≈ 0.70`
+
+This matches the observed late-stage reward around `0.69–0.71`.
+
+### Candidate Status
+
+This run is a strong final candidate if the project prioritizes a more realistic defect distribution.
+
+The previous `0.50` sensor-driven run remains a strong candidate if the project prioritizes maximum training stability and cleaner convergence curves.
