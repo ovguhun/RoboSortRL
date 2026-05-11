@@ -38,9 +38,7 @@ Across the selected TensorBoard window, the policy accepted good products, rejec
 
 ## Demo preview
 
-https://github.com/ovguhun/RoboSortRL/blob/main/media/demo_video/RoboSort_demo_short.mp4
-
-[Watch the demo video](media/demo_video/RoboSort_demo_short.mp4)
+[Watch the short demo video](media/demo_video/RoboSort_demo_short.mp4)
 
 ## Project highlights
 
