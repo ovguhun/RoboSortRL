@@ -2,15 +2,13 @@
 
 **RoboSortRL** is a Unity ML-Agents reinforcement learning project where a kinematic robotic sorter is trained with PPO to reject defective conveyor products while allowing good products to pass.
 
-The project demonstrates an industrial quality-control scenario with continuous control, moving conveyor products, RayPerception sensors, TensorBoard-backed PPO experiments, and a final trained ONNX policy.
-
-**Demo video:** [Watch the final demo on Google Drive](https://drive.google.com/file/d/1g_fRtZahQldUiNSnAivVDNn0IeIdDGaQ/view?usp=sharing)
+The project simulates an industrial quality-control task with moving conveyor products, sensor-based observations, continuous control, TensorBoard-backed PPO experiments, and a final trained ONNX policy.
 
 ---
 
 ## Final result
 
-The final model was selected from a fine-tuned PPO run after correcting the pusher-contact behavior and adding push-discipline rewards.
+The selected final policy was trained after correcting the pusher-contact behavior and fine-tuning the agent with push-discipline rewards.
 
 | Item | Final value |
 |---|---|
@@ -34,46 +32,36 @@ Selected checkpoint metrics:
 | DefectMissed | `0` |
 | TotalOutcomes | `179` |
 
-Across the selected final TensorBoard window, the model accepted good products, rejected defective products, and recorded no false rejects or missed defects.
+Across the selected TensorBoard window, the policy accepted good products, rejected defective products, and recorded no false rejects or missed defects.
 
 ---
 
-## Why this project is more than a tutorial
+## Project highlights
 
-RoboSortRL combines the core ML-Agents concepts from smaller lab exercises into a larger industrial simulation:
-
-- a 3D Unity environment,
-- moving conveyor products,
-- randomized spawn positions,
-- randomized conveyor speeds,
-- 8 parallel training cells,
-- vector observations plus `RayPerceptionSensor3D`,
-- 3 continuous actions,
-- custom PPO YAML files,
-- multiple PPO/hyperparameter comparisons,
-- TensorBoard experiment evidence,
-- a polished visual demo scene.
+- Unity 3D industrial conveyor environment
+- PPO reinforcement learning with Unity ML-Agents
+- 8 parallel training cells in `TrainingScene_Parallel8`
+- Moving conveyor products with randomized spawn positions and conveyor speeds
+- Vector observations plus `RayPerceptionSensor3D`
+- 3 continuous actions
+- Custom PPO YAML files
+- Multiple PPO/hyperparameter comparisons
+- TensorBoard diagnostics and final evidence screenshots
+- Visual-only factory demo scene
+- Final trained ONNX policy used in `DemoScene`
 
 ---
 
-## Core architecture decision
+## Architecture note
 
-The most important engineering rule in the project is the separation between simulation truth and visual assets:
+The project keeps training logic and presentation assets separate:
 
 ```text
 SimulationRoot = training truth
 VisualRoot     = visual-only factory/demo skin
 ```
 
-The imported factory visuals are used only for presentation. They do not control:
-
-- reward logic,
-- observations,
-- triggers,
-- physics,
-- product spawning,
-- RayPerception targets,
-- episode reset logic.
+Factory visuals are used as visual-only presentation assets. Simulation proxies remain responsible for rewards, observations, triggers, physics, product spawning, ray targets, and episode reset logic.
 
 This keeps PPO training stable while allowing the demo scene to look like an industrial environment.
 
@@ -113,7 +101,7 @@ This keeps PPO training stable while allowing the demo scene to look like an ind
 | Defect product missed | `-2.0` |
 | Time penalty per decision | `-0.001` |
 
-Additional shaping and discipline:
+Additional shaping and push discipline:
 
 | Component | Value |
 |---|---:|
@@ -124,7 +112,7 @@ Additional shaping and discipline:
 | Max defect alignment reward per decision | `0.003` |
 | Defect alignment zone padding | `0.75` |
 
-Reward standard deviation is not expected to collapse to near zero because the reward distribution is intentionally asymmetric. Good accepted products and rejected defects receive different rewards, so outcome counters are the main success metrics.
+Reward standard deviation is not expected to collapse to near zero because the final reward distribution is intentionally asymmetric. Outcome counters are the primary success metrics.
 
 ---
 
@@ -151,7 +139,7 @@ Final TensorBoard screenshots are stored in:
 media/screenshots/tensorboard/
 ```
 
-The final evidence includes:
+Final evidence includes:
 
 - `tensorboard_07_final_actuator_Accuracy.png`
 - `tensorboard_07_final_actuator_Cumulative_Reward.png`
@@ -159,8 +147,6 @@ The final evidence includes:
 - `tensorboard_07_final_actuator_Defect_Missed.png`
 - `tensorboard_07_final_actuator_GoodProductPushPenalty.png`
 - `tensorboard_07_final_actuator_NoProductPushPenalty.png`
-
-These screenshots show that the final policy reaches near-perfect sorting accuracy while push-discipline penalties decrease during fine-tuning.
 
 ---
 
@@ -181,7 +167,7 @@ The project was developed and tested with:
 
 ## How to run the demo
 
-1. Clone/open the Unity project.
+1. Open the Unity project.
 2. Open:
 
    ```text
@@ -202,7 +188,7 @@ Expected behavior:
 
 - defective products are rejected with visible pusher contact,
 - good products pass through the accept path,
-- imported factory visuals remain visual-only,
+- factory visuals remain visual-only,
 - training simulation logic remains proxy-based.
 
 ---
@@ -231,18 +217,9 @@ The final selected model was produced through iterative PPO training and fine-tu
 
 ## Limitations
 
-This is not a high-fidelity robot-arm or sim-to-real robotics simulator. The sorter uses stable kinematic proxy mechanics so PPO can learn from reliable rewards and repeatable environment dynamics.
+RoboSortRL is an RL-focused industrial sorting simulation, not a high-fidelity robotics or sim-to-real system.
 
-Main limitations:
-
-- no full 6-axis robot arm,
-- no real gripping,
-- no camera-based CNN perception,
-- no sim-to-real transfer validation,
-- product geometry is simplified,
-- factory assets are visual-only.
-
-These choices were intentional because the project goal is reinforcement learning policy training, not fragile mechanical simulation.
+The project intentionally uses stable kinematic proxy mechanics so PPO can learn from reliable reward signals and repeatable environment dynamics.
 
 ---
 
@@ -271,14 +248,14 @@ The historical documents are kept intentionally because they show the project ev
 
 ## Methodology
 
-This project is reinforcement learning, not imitation learning.
+This project uses reinforcement learning, not imitation learning.
 
 It does not use:
 
-- demonstration recording,
+- demonstration recordings,
 - `.demo` files,
 - behavioral cloning,
 - GAIL,
 - expert action labels.
 
-The final model is trained with PPO using environment rewards and TensorBoard-guided iteration.
+The final policy was trained with PPO using environment rewards and TensorBoard-guided iteration.
