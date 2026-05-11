@@ -154,22 +154,20 @@ Expected demo behavior:
 - no magic push behavior,
 - factory visuals remain visual-only.
 
+```md
 ### Training command example
 
 Activate the ML-Agents environment:
 
-```bash
-conda activate mlagents
-cd path/to/RoboSortRL-Pro
+    conda activate mlagents
+    cd path/to/RoboSortRL-Pro
 
-Example PPO command:
+Start PPO training on CPU:
 
-```
-mlagents-learn config/robosort_ppo_baseline.yaml \
-    --run-id=RoboSort_PPO_Baseline_001 \
-    --results-dir results \
-    --torch-device cpu
-```
+    mlagents-learn config/robosort_ppo_baseline.yaml \
+        --run-id=RoboSort_PPO_Baseline_001 \
+        --results-dir results \
+        --torch-device cpu
 
 To resume from a previous checkpoint, add:
 
