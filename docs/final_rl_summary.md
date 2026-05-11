@@ -1,3 +1,5 @@
+> **Final update:** The current selected final demo model is documented in docs/final_model_update.md and README.md.
+> Older Defect30 references in this file are retained as historical training notes, not the final selected demo model.
 # Final RL Summary
 
 ## RoboSortRL Pro — Final Training Result Summary
@@ -133,3 +135,4 @@ A future curriculum-learning extension could train progressively through:
 - `0.20` or `0.10` defect probability
 
 This should not be added to the current final candidate without separate validation.
+

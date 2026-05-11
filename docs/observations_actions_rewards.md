@@ -1,3 +1,5 @@
+> **Final update:** The current selected final demo model is documented in docs/final_model_update.md and README.md.
+> Older Defect30 references in this file are retained as historical training notes, not the final selected demo model.
 # Observations, Actions, and Rewards
 
 ## RoboSortRL Pro — Current RL Setup
@@ -204,3 +206,4 @@ In this setup:
 - The reward plateau around `0.72–0.76` is explained by accumulated time penalty, not by poor sorting accuracy.
 
 This is the preferred final RL core because it demonstrates sensor-driven reinforcement learning rather than simple vector-label lookup.
+
