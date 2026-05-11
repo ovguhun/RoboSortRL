@@ -252,10 +252,10 @@ This project uses reinforcement learning, not imitation learning.
 
 It does not use:
 
-- demonstration recordings,
-- `.demo` files,
-- behavioral cloning,
-- GAIL,
-- expert action labels.
+- demonstration recordings
+- `.demo` files
+- behavioral cloning
+- GAIL
+- expert action labels
 
 The final policy was trained with PPO using environment rewards and TensorBoard-guided iteration.
