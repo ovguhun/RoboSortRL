@@ -195,16 +195,16 @@ The historical documents are kept intentionally because they show the project ev
 
 ### Notes for evaluation
 
-This project is reinforcement learning, not imitation learning.
+This project uses reinforcement learning, not imitation learning.
 
 It does not use:
 
-- demonstration recording,
-- .demo files,
-- behavioral cloning,
-- GAIL,
-- expert action labels.
+- demonstration recordings
+- `.demo` files
+- behavioral cloning
+- GAIL
+- expert action labels
 
-The final model is trained through PPO using environment rewards and TensorBoard-guided iteration.
+The final policy was trained with PPO using environment rewards, with training progress monitored and iterated through TensorBoard.
 
 
