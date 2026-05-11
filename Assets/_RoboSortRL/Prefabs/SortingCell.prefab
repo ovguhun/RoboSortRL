@@ -1268,7 +1268,9 @@ MonoBehaviour:
   distanceNormalization: 6
   conveyorSpeedNormalization: 3
   correctSortReward: 1
-  incorrectSortPenalty: -1
+  defectRejectedReward: 1.5
+  incorrectSortPenalty: -1.5
+  defectMissedPenalty: -2
   timePenaltyPerDecision: -0.001
   endEpisodeOnSortingOutcome: 1
   useRewardV2: 0
