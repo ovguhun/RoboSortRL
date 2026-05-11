@@ -29,7 +29,7 @@ Final checkpoint metrics:
 | GoodAccepted | `110` |
 | DefectRejected | `69` |
 | GoodRejected | `0 / not found in final window` |
-| DefectMissed | `0 implied in final window` |
+| DefectMissed | `0 / not found in final window` |
 | TotalOutcomes | `179` |
 
 ---
@@ -151,7 +151,7 @@ Expected demo behavior:
 
 - defective products are rejected with clean visible contact,
 - good products pass through the accept path,
-- no magic push behavior,
+- rejects occur through visible pusher contact,
 - factory visuals remain visual-only.
 
 ### Training command example
