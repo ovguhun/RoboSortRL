@@ -1,24 +1,26 @@
 # RoboSortRL
 
-**RoboSortRL** is a Unity ML-Agents reinforcement learning project where a kinematic robotic sorter is trained with PPO to reject defective conveyor products while allowing good products to pass.
+**RoboSortRL** is a Unity ML-Agents reinforcement learning project where a kinematic robotic sorter is trained with PPO to reject defective conveyor products while letting good products pass.
 
-The project simulates an industrial quality-control task with moving conveyor products, sensor-based observations, continuous control, TensorBoard-backed PPO experiments, and a final trained ONNX policy.
+The project simulates an industrial quality-control task with moving conveyor products, sensor-based observations, continuous control, TensorBoard-tracked PPO experiments, and a final trained ONNX policy.
 
 ---
 
 ## Final result
 
-The selected final policy was trained after correcting the pusher-contact behavior and fine-tuning the agent with push-discipline rewards.
+The selected final policy was trained after correcting the pusher-contact behavior and fine-tuning with push-discipline rewards.
 
 | Item | Final value |
 |---|---|
-| Final model | `Assets/_RoboSortRL/Training/Models/RoboSort_ActuatorPenaltyFix_Defect35_Baseline_950k_Candidate.onnx` |
 | Final run | `RoboSort_PPO_PushDiscipline_ActuatorPenaltyFix_Baseline_001` |
 | Selected checkpoint | `RoboSort-949965.onnx` |
 | Algorithm | PPO |
 | Network | 128 hidden units, 2 layers |
 | Training scene | `TrainingScene_Parallel8` |
 | Demo scene | `DemoScene` |
+
+Final model file:
+`Assets/_RoboSortRL/Training/Models/RoboSort_ActuatorPenaltyFix_Defect35_Baseline_950k_Candidate.onnx`
 
 Selected checkpoint metrics:
 
@@ -40,6 +42,24 @@ Across the selected TensorBoard window, the policy accepted good products, rejec
 
 [Watch the short demo video](media/demo_video/RoboSort_demo_short.mp4)
 
+---
+
+## TensorBoard evidence
+
+![Cumulative reward — final run](media/screenshots/tensorboard/tensorboard_07_final_actuator_Cumulative_Reward.png)
+
+![Accuracy — final run](media/screenshots/tensorboard/tensorboard_07_final_actuator_Accuracy.png)
+
+![Defects rejected — final run](media/screenshots/tensorboard/tensorboard_07_final_actuator_Defect_Rejected.png)
+
+Additional diagnostics in `media/screenshots/tensorboard/`:
+
+- `tensorboard_07_final_actuator_Defect_Missed.png`
+- `tensorboard_07_final_actuator_GoodProductPushPenalty.png`
+- `tensorboard_07_final_actuator_NoProductPushPenalty.png`
+
+---
+
 ## Project highlights
 
 - Unity 3D industrial conveyor environment
@@ -49,7 +69,7 @@ Across the selected TensorBoard window, the policy accepted good products, rejec
 - Vector observations plus `RayPerceptionSensor3D`
 - 3 continuous actions
 - Custom PPO YAML files
-- Multiple PPO/hyperparameter comparisons
+- Multiple PPO / hyperparameter comparisons
 - TensorBoard diagnostics and final evidence screenshots
 - Visual-only factory demo scene
 - Final trained ONNX policy used in `DemoScene`
@@ -65,7 +85,7 @@ SimulationRoot = training truth
 VisualRoot     = visual-only factory/demo skin
 ```
 
-Factory visuals are used as visual-only presentation assets. Simulation proxies remain responsible for rewards, observations, triggers, physics, product spawning, ray targets, and episode reset logic.
+Factory visuals are presentation-only. Simulation proxies remain responsible for rewards, observations, triggers, physics, product spawning, ray targets, and episode reset logic.
 
 This keeps PPO training stable while allowing the demo scene to look like an industrial environment.
 
@@ -79,7 +99,7 @@ This keeps PPO training stable while allowing the demo scene to look like an ind
 | Algorithm | PPO |
 | Vector observation size | `13` |
 | Action space | `3` continuous actions |
-| Sensors | Vector observations + RayPerceptionSensor3D |
+| Sensors | Vector observations + `RayPerceptionSensor3D` |
 | Direct product-type vector cue | Hidden |
 | Defect probability | `0.35` |
 | Reward V2 | Enabled for push discipline |
@@ -89,7 +109,7 @@ This keeps PPO training stable while allowing the demo scene to look like an ind
 
 ### Actions
 
-| Action index | Meaning |
+| Index | Meaning |
 |---:|---|
 | `0` | Sorter carriage movement along Z |
 | `1` | Pusher extension / retraction along X |
@@ -116,7 +136,7 @@ Additional shaping and push discipline:
 | Max defect alignment reward per decision | `0.003` |
 | Defect alignment zone padding | `0.75` |
 
-Reward standard deviation is not expected to collapse to near zero because the final reward distribution is intentionally asymmetric. Outcome counters are the primary success metrics.
+Reward standard deviation is not expected to collapse to near zero because the reward distribution is intentionally asymmetric (good-accepted and defect-rejected carry different magnitudes). Outcome counters are the primary success metric.
 
 ---
 
@@ -125,32 +145,13 @@ Reward standard deviation is not expected to collapse to near zero because the f
 | Run | Purpose | Result |
 |---|---|---|
 | `RoboSort_PPO_Baseline_002` | Initial PPO baseline | Proved basic sorting learnability |
-| `RoboSort_PPO_Ray_001` | Add RayPerceptionSensor3D | Confirmed ray-enabled training works |
+| `RoboSort_PPO_Ray_001` | Add `RayPerceptionSensor3D` | Confirmed ray-enabled training works |
 | `RoboSort_PPO_Parallel8_Smoke_001` | Validate 8 parallel cells | Improved training throughput |
 | `RoboSort_PPO_LargeNet_Parallel8_001` | Larger network comparison | Useful comparison, not final |
 | `RoboSort_PPO_SensorDrivenType_Defect30_001` | Earlier strong sensor-driven candidate | Near-perfect previous candidate |
 | `RoboSort_PPO_PusherContact_OutcomeAlign_Baseline_001` | Corrected pusher contact + asymmetric rewards + alignment shaping | Strong 128-unit policy |
 | `RoboSort_PPO_PusherContact_PushDiscipline_Defect35_Baseline_001` | Defect35 fine-tune with push discipline | Strong final-family candidate |
 | `RoboSort_PPO_PushDiscipline_ActuatorPenaltyFix_Baseline_001` | Final actuator-aligned push-penalty fix | Selected final demo model |
-
----
-
-## TensorBoard evidence
-
-Final TensorBoard screenshots are stored in:
-
-```text
-media/screenshots/tensorboard/
-```
-
-Final evidence includes:
-
-- `tensorboard_07_final_actuator_Accuracy.png`
-- `tensorboard_07_final_actuator_Cumulative_Reward.png`
-- `tensorboard_07_final_actuator_Defect_Rejected.png`
-- `tensorboard_07_final_actuator_Defect_Missed.png`
-- `tensorboard_07_final_actuator_GoodProductPushPenalty.png`
-- `tensorboard_07_final_actuator_NoProductPushPenalty.png`
 
 ---
 
@@ -172,7 +173,7 @@ The project was developed and tested with:
 ## How to run the demo
 
 1. Open the Unity project.
-2. Open:
+2. Open the demo scene:
 
    ```text
    Assets/_RoboSortRL/Scenes/DemoScene.unity
@@ -196,7 +197,6 @@ Expected behavior:
 - training simulation logic remains proxy-based.
 
 ---
-
 ## Training command example
 
 Activate the ML-Agents environment and move to the project root:
@@ -234,11 +234,11 @@ Current final source of truth:
 - `README.md`
 - `docs/final_model_update.md`
 
-Architecture and safety policy:
+Architecture and policy:
 
 - `docs/asset_import_policy.md`
 
-Historical experiment/reference documents:
+Historical experiment / reference documents (kept to show project evolution — baseline PPO, RayPerception, parallel training, pusher-contact correction, reward tuning, final model selection):
 
 - `docs/training_log.md`
 - `docs/training_log_pusher_contact_v1.md`
@@ -246,20 +246,3 @@ Historical experiment/reference documents:
 - `docs/observations_actions_rewards.md`
 - `docs/risk_register.md`
 
-The historical documents are kept intentionally because they show the project evolution: baseline PPO, RayPerception, parallel training, pusher-contact correction, reward tuning, and final model selection.
-
----
-
-## Methodology
-
-This project uses reinforcement learning, not imitation learning.
-
-It does not use:
-
-- demonstration recordings
-- `.demo` files
-- behavioral cloning
-- GAIL
-- expert action labels
-
-The final policy was trained with PPO using environment rewards and TensorBoard-guided iteration.
