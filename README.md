@@ -174,14 +174,24 @@ To resume from a previous checkpoint, add:
 
 ### Documentation
 
-Important project documents:
+Current final source of truth:
 
-- docs/final_model_update.md
-- docs/training_log.md
-- docs/training_log_pusher_contact_v1.md
-- docs/observations_actions_rewards.md
-- docs/risk_register.md
-- docs/asset_import_policy.md
+- `README.md`
+- `docs/final_model_update.md`
+
+Architecture and safety policy:
+
+- `docs/asset_import_policy.md`
+
+Historical experiment/reference documents:
+
+- `docs/training_log.md`
+- `docs/training_log_pusher_contact_v1.md`
+- `docs/final_rl_summary.md`
+- `docs/observations_actions_rewards.md`
+- `docs/risk_register.md`
+
+The historical documents are kept intentionally because they show the project evolution: baseline PPO, RayPerception, parallel training, pusher-contact correction, reward tuning, and final model selection. The current selected final model is documented in `docs/final_model_update.md`.
 
 ### Notes for evaluation
 
