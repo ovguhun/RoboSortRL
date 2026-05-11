@@ -484,12 +484,12 @@ namespace RoboSortRL.Agents
                 return;
             }
 
-            if (pushStrengthInput <= pushPenaltyThreshold)
+            if (sorterController == null || sorterController.PushStrength <= pushPenaltyThreshold)
             {
                 return;
             }
 
-            if (sorterController == null || sorterController.ExtensionAmount < extensionPenaltyThreshold)
+            if (sorterController.ExtensionAmount < extensionPenaltyThreshold)
             {
                 return;
             }
