@@ -36,6 +36,10 @@ Across the selected TensorBoard window, the policy accepted good products, rejec
 
 ---
 
+## Demo preview
+
+[Watch the demo video](media/demo_video/RoboSort_demo_short.mp4)
+
 ## Project highlights
 
 - Unity 3D industrial conveyor environment
