@@ -1,6 +1,6 @@
-# RoboSortRL Pro
+# RoboSortRL
 
-**RoboSortRL Pro** is a Unity ML-Agents reinforcement learning project where a PPO-trained kinematic robotic sorter learns to reject defective conveyor products while allowing good products to pass.
+**RoboSortRL** is a Unity ML-Agents reinforcement learning project where a PPO-trained kinematic robotic sorter learns to reject defective conveyor products while allowing good products to pass.
 
 The project is framed as an industrial quality-control simulation for robotics and reinforcement learning.
 
@@ -159,7 +159,7 @@ Expected demo behavior:
 Activate the ML-Agents environment:
 
     conda activate mlagents
-    cd path/to/RoboSortRL-Pro
+    cd path/to/RoboSortRL
 
 Start PPO training on CPU:
 
