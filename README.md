@@ -163,10 +163,10 @@ Activate the ML-Agents environment:
 
 Start PPO training on CPU:
 
-    ```mlagents-learn config/robosort_ppo_baseline.yaml \
+    mlagents-learn config/robosort_ppo_baseline.yaml \
         --run-id=RoboSort_PPO_Baseline_001 \
         --results-dir results \
-        --torch-device cpu```
+        --torch-device cpu
 
 To resume from a previous checkpoint, add:
 
