@@ -1,26 +1,28 @@
 # RoboSortRL
 
-**RoboSortRL** is a Unity ML-Agents reinforcement learning project where a PPO-trained kinematic robotic sorter learns to reject defective conveyor products while allowing good products to pass.
+**RoboSortRL** is a Unity ML-Agents reinforcement learning project where a kinematic robotic sorter is trained with PPO to reject defective conveyor products while allowing good products to pass.
 
-The project is framed as an industrial quality-control simulation for robotics and reinforcement learning.
+The project demonstrates an industrial quality-control scenario with continuous control, moving conveyor products, RayPerception sensors, TensorBoard-backed PPO experiments, and a final trained ONNX policy.
+
+**Demo video:** [Watch the final demo on Google Drive](https://drive.google.com/file/d/1g_fRtZahQldUiNSnAivVDNn0IeIdDGaQ/view?usp=sharing)
 
 ---
 
-## Final status
+## Final result
 
-Final selected demo model:
+The final model was selected from a fine-tuned PPO run after correcting the pusher-contact behavior and adding push-discipline rewards.
 
-`Assets/_RoboSortRL/Training/Models/RoboSort_ActuatorPenaltyFix_Defect35_Baseline_950k_Candidate.onnx`
+| Item | Final value |
+|---|---|
+| Final model | `Assets/_RoboSortRL/Training/Models/RoboSort_ActuatorPenaltyFix_Defect35_Baseline_950k_Candidate.onnx` |
+| Final run | `RoboSort_PPO_PushDiscipline_ActuatorPenaltyFix_Baseline_001` |
+| Selected checkpoint | `RoboSort-949965.onnx` |
+| Algorithm | PPO |
+| Network | 128 hidden units, 2 layers |
+| Training scene | `TrainingScene_Parallel8` |
+| Demo scene | `DemoScene` |
 
-Final selected run:
-
-`RoboSort_PPO_PushDiscipline_ActuatorPenaltyFix_Baseline_001`
-
-Selected checkpoint:
-
-`RoboSort-949965.onnx`
-
-Final checkpoint metrics:
+Selected checkpoint metrics:
 
 | Metric | Value |
 |---|---:|
@@ -28,151 +30,223 @@ Final checkpoint metrics:
 | Accuracy | `1.0000` |
 | GoodAccepted | `110` |
 | DefectRejected | `69` |
-| GoodRejected | `0 / not found in final window` |
-| DefectMissed | `0 / not found in final window` |
+| GoodRejected | `0` |
+| DefectMissed | `0` |
 | TotalOutcomes | `179` |
 
----
-
-## Project features
-
-- Unity 3D industrial conveyor environment
-- PPO reinforcement learning with Unity ML-Agents
-- 8 parallel training cells in `TrainingScene_Parallel8`
-- Moving conveyor products
-- Kinematic robotic sorter / pusher
-- 3 continuous actions
-- Vector observations plus RayPerceptionSensor3D
-- Custom PPO YAML configs
-- TensorBoard experiment tracking
-- Multiple PPO/hyperparameter comparisons
-- Final visual demo scene using factory-style visual polish
-- Visual assets separated from training simulation logic
+Across the selected final TensorBoard window, the model accepted good products, rejected defective products, and recorded no false rejects or missed defects.
 
 ---
 
-## Architecture rule
+## Why this project is more than a tutorial
 
-The project separates training logic from visual assets:
+RoboSortRL combines the core ML-Agents concepts from smaller lab exercises into a larger industrial simulation:
+
+- a 3D Unity environment,
+- moving conveyor products,
+- randomized spawn positions,
+- randomized conveyor speeds,
+- 8 parallel training cells,
+- vector observations plus `RayPerceptionSensor3D`,
+- 3 continuous actions,
+- custom PPO YAML files,
+- multiple PPO/hyperparameter comparisons,
+- TensorBoard experiment evidence,
+- a polished visual demo scene.
+
+---
+
+## Core architecture decision
+
+The most important engineering rule in the project is the separation between simulation truth and visual assets:
 
 ```text
 SimulationRoot = training truth
 VisualRoot     = visual-only factory/demo skin
 ```
 
-Imported visual assets do not control reward logic, observations, triggers, physics, product spawning, RayPerception targets, or episode reset logic.
+The imported factory visuals are used only for presentation. They do not control:
 
-This keeps PPO training stable while allowing the final demo scene to look more professional.
+- reward logic,
+- observations,
+- triggers,
+- physics,
+- product spawning,
+- RayPerception targets,
+- episode reset logic.
 
-### Final RL setup
+This keeps PPO training stable while allowing the demo scene to look like an industrial environment.
 
-| Item | Final value |
+---
+
+## RL setup
+
+| Component | Final setup |
 |---|---|
+| Behavior name | `RoboSort` |
 | Algorithm | PPO |
-| Network | 128 hidden units, 2 layers |
-| Training scene | TrainingScene_Parallel8 |
-| Demo scene | DemoScene |
-| Action space | 3 continuous actions |
-| Vector observation size | 13 |
+| Vector observation size | `13` |
+| Action space | `3` continuous actions |
 | Sensors | Vector observations + RayPerceptionSensor3D |
 | Direct product-type vector cue | Hidden |
-| Defect probability | 0.35 |
+| Defect probability | `0.35` |
 | Reward V2 | Enabled for push discipline |
-| Correct-sort speed bonus | Disabled (0) |
+| Correct-sort speed bonus | Disabled (`0`) |
 | Defect alignment shaping | Enabled |
-| Final demo behavior type | Inference Only |
+| Demo behavior type | Inference Only |
 
-### Action space
+### Actions
 
-The agent controls three continuous actions:
+| Action index | Meaning |
+|---:|---|
+| `0` | Sorter carriage movement along Z |
+| `1` | Pusher extension / retraction along X |
+| `2` | Push activation / strength |
 
-| Action | Meaning |
-|---|---|
-| 0 | Sorter carriage movement along Z |
-| 1 | Pusher extension / retraction along X |
-| 2 | Push activation / strength |
-
-### Reward design
-
-Final reward values:
+### Rewards
 
 | Outcome | Reward |
 |---|---:|
-| Good product accepted | +1.0 |
-| Defect product rejected | +1.5 |
-| Good product wrongly rejected | -1.5 |
-| Defect product missed | -2.0 |
-| Time penalty per decision | -0.001 |
+| Good product accepted | `+1.0` |
+| Defect product rejected | `+1.5` |
+| Good product wrongly rejected | `-1.5` |
+| Defect product missed | `-2.0` |
+| Time penalty per decision | `-0.001` |
 
-Additional shaping and push discipline:
+Additional shaping and discipline:
 
 | Component | Value |
 |---|---:|
-| No-product push penalty | -0.005 |
-| Good-product push penalty | -0.01 |
-| Push penalty threshold | 0.5 actual mapped push strength |
-| Defect alignment progress reward scale | 0.01 |
-| Max defect alignment reward per decision | 0.003 |
-| Defect alignment zone padding | 0.75 |
+| No-product push penalty | `-0.005` |
+| Good-product push penalty | `-0.01` |
+| Push penalty threshold | `0.5` actual mapped push strength |
+| Defect alignment progress reward scale | `0.01` |
+| Max defect alignment reward per decision | `0.003` |
+| Defect alignment zone padding | `0.75` |
 
-Reward standard deviation is not expected to collapse to near zero because good accepted products and rejected defects intentionally receive different reward magnitudes. Outcome counters are the primary success criteria.
+Reward standard deviation is not expected to collapse to near zero because the reward distribution is intentionally asymmetric. Good accepted products and rejected defects receive different rewards, so outcome counters are the main success metrics.
 
-### Key training runs
+---
+
+## Training run history
 
 | Run | Purpose | Result |
 |---|---|---|
-| RoboSort_PPO_Baseline_002 | Initial PPO baseline | Proved basic sorting learnability |
-| RoboSort_PPO_LargeNet_Parallel8_001 | Larger network comparison | Useful comparison, not final |
-| RoboSort_PPO_SensorDrivenType_Defect30_001 | Strong earlier candidate with hidden product-type cue | Near-perfect old final candidate |
-| RoboSort_PPO_PusherContact_OutcomeAlign_Baseline_001 | Corrected pusher contact + asymmetric rewards + alignment shaping | Strong 128-unit policy |
-| RoboSort_PPO_PusherContact_PushDiscipline_Defect35_Baseline_001 | Defect35 fine-tune with push discipline | Strong final-family candidate |
-| RoboSort_PPO_PushDiscipline_ActuatorPenaltyFix_Baseline_001 | Final actuator-aligned push-penalty fix | Selected final demo model |
+| `RoboSort_PPO_Baseline_002` | Initial PPO baseline | Proved basic sorting learnability |
+| `RoboSort_PPO_Ray_001` | Add RayPerceptionSensor3D | Confirmed ray-enabled training works |
+| `RoboSort_PPO_Parallel8_Smoke_001` | Validate 8 parallel cells | Improved training throughput |
+| `RoboSort_PPO_LargeNet_Parallel8_001` | Larger network comparison | Useful comparison, not final |
+| `RoboSort_PPO_SensorDrivenType_Defect30_001` | Earlier strong sensor-driven candidate | Near-perfect previous candidate |
+| `RoboSort_PPO_PusherContact_OutcomeAlign_Baseline_001` | Corrected pusher contact + asymmetric rewards + alignment shaping | Strong 128-unit policy |
+| `RoboSort_PPO_PusherContact_PushDiscipline_Defect35_Baseline_001` | Defect35 fine-tune with push discipline | Strong final-family candidate |
+| `RoboSort_PPO_PushDiscipline_ActuatorPenaltyFix_Baseline_001` | Final actuator-aligned push-penalty fix | Selected final demo model |
 
-### How to run inference demo
+---
 
-Open the Unity project.
+## TensorBoard evidence
 
-Open:
+Final TensorBoard screenshots are stored in:
 
-`Assets/_RoboSortRL/Scenes/DemoScene.unity`
+```text
+media/screenshots/tensorboard/
+```
 
-Select the demo RoboSortAgent.
+The final evidence includes:
 
-Confirm Behavior Parameters:
+- `tensorboard_07_final_actuator_Accuracy.png`
+- `tensorboard_07_final_actuator_Cumulative_Reward.png`
+- `tensorboard_07_final_actuator_Defect_Rejected.png`
+- `tensorboard_07_final_actuator_Defect_Missed.png`
+- `tensorboard_07_final_actuator_GoodProductPushPenalty.png`
+- `tensorboard_07_final_actuator_NoProductPushPenalty.png`
 
-- Behavior Name: RoboSort
-- Behavior Type: Inference Only
-- Model: RoboSort_ActuatorPenaltyFix_Defect35_Baseline_950k_Candidate
-- Continuous Actions: 3
+These screenshots show that the final policy reaches near-perfect sorting accuracy while push-discipline penalties decrease during fine-tuning.
 
-Press Play.
+---
 
-Expected demo behavior:
+## Requirements
 
-- defective products are rejected with clean visible contact,
+The project was developed and tested with:
+
+| Tool | Version |
+|---|---|
+| Unity | Unity 6.3 LTS / `6000.3.14f1` |
+| Unity ML-Agents package | `4.0.3` |
+| Python | `3.10.12` |
+| ML-Agents Python package | `1.1.0` |
+| PyTorch | `2.2.2+cpu` |
+| OS used for development | Windows 11 |
+
+---
+
+## How to run the demo
+
+1. Clone/open the Unity project.
+2. Open:
+
+   ```text
+   Assets/_RoboSortRL/Scenes/DemoScene.unity
+   ```
+
+3. Select the demo `RoboSortAgent`.
+4. Confirm `Behavior Parameters`:
+
+   - Behavior Name: `RoboSort`
+   - Behavior Type: `Inference Only`
+   - Model: `RoboSort_ActuatorPenaltyFix_Defect35_Baseline_950k_Candidate`
+   - Continuous Actions: `3`
+
+5. Press Play.
+
+Expected behavior:
+
+- defective products are rejected with visible pusher contact,
 - good products pass through the accept path,
-- rejects occur through visible pusher contact,
-- factory visuals remain visual-only.
+- imported factory visuals remain visual-only,
+- training simulation logic remains proxy-based.
 
-### Training command example
+---
 
-Activate the ML-Agents environment:
+## Training command example
 
-    conda activate mlagents
-    cd path/to/RoboSortRL
+Activate the ML-Agents environment and move to the project root:
 
-Start PPO training on CPU:
+```powershell
+conda activate mlagents
+cd path/to/RoboSortRL
+```
 
-    mlagents-learn config/robosort_ppo_baseline.yaml \
-        --run-id=RoboSort_PPO_Baseline_001 \
-        --results-dir results \
-        --torch-device cpu
+Example PPO training command from scratch:
 
-To resume from a previous checkpoint, add:
+```powershell
+mlagents-learn config/robosort_ppo_baseline.yaml `
+    --run-id=RoboSort_PPO_Example_Run `
+    --results-dir results `
+    --torch-device cpu
+```
 
-    --initialize-from=Previous_Run_ID
+The final selected model was produced through iterative PPO training and fine-tuning. See `docs/final_model_update.md` for the final model explanation.
 
-### Documentation
+---
+
+## Limitations
+
+This is not a high-fidelity robot-arm or sim-to-real robotics simulator. The sorter uses stable kinematic proxy mechanics so PPO can learn from reliable rewards and repeatable environment dynamics.
+
+Main limitations:
+
+- no full 6-axis robot arm,
+- no real gripping,
+- no camera-based CNN perception,
+- no sim-to-real transfer validation,
+- product geometry is simplified,
+- factory assets are visual-only.
+
+These choices were intentional because the project goal is reinforcement learning policy training, not fragile mechanical simulation.
+
+---
+
+## Documentation
 
 Current final source of truth:
 
@@ -191,20 +265,20 @@ Historical experiment/reference documents:
 - `docs/observations_actions_rewards.md`
 - `docs/risk_register.md`
 
-The historical documents are kept intentionally because they show the project evolution: baseline PPO, RayPerception, parallel training, pusher-contact correction, reward tuning, and final model selection. The current selected final model is documented in `docs/final_model_update.md`.
+The historical documents are kept intentionally because they show the project evolution: baseline PPO, RayPerception, parallel training, pusher-contact correction, reward tuning, and final model selection.
 
-### Notes for evaluation
+---
 
-This project uses reinforcement learning, not imitation learning.
+## Methodology
+
+This project is reinforcement learning, not imitation learning.
 
 It does not use:
 
-- demonstration recordings
-- `.demo` files
-- behavioral cloning
-- GAIL
-- expert action labels
+- demonstration recording,
+- `.demo` files,
+- behavioral cloning,
+- GAIL,
+- expert action labels.
 
-The final policy was trained with PPO using environment rewards, with training progress monitored and iterated through TensorBoard.
-
-
+The final model is trained with PPO using environment rewards and TensorBoard-guided iteration.
