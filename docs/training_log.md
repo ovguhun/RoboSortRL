@@ -1,3 +1,5 @@
+> **Final update:** The current selected final demo model is documented in docs/final_model_update.md and README.md.
+> Older Defect30 references in this file are retained as historical training notes, not the final selected demo model.
 # RoboSortRL Pro — Training Log
 
 ## Run: RoboSort_PPO_Baseline_002
@@ -615,3 +617,4 @@ This matches the observed late-stage reward around `0.69–0.71`.
 This run is a strong final candidate if the project prioritizes a more realistic defect distribution.
 
 The previous `0.50` sensor-driven run remains a strong candidate if the project prioritizes maximum training stability and cleaner convergence curves.
+

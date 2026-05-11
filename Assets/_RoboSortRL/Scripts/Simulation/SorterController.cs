@@ -52,6 +52,7 @@ namespace RoboSortRL.Simulation
         private Vector3 initialPusherLocalPosition;
 
         public float NormalizedCarriagePosition { get; private set; }
+        public float CurrentCarriageZOffset => currentCarriageZOffset;
         public float ExtensionAmount => currentExtensionAmount;
         public float PushStrength => currentPushStrength;
 

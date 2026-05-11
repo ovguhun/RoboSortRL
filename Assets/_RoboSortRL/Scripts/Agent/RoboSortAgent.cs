@@ -4,6 +4,7 @@ using Unity.MLAgents.Actuators;
 using Unity.MLAgents.Policies;
 using Unity.MLAgents.Sensors;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
@@ -35,6 +36,7 @@ namespace RoboSortRL.Agents
         private const string SpeedBonusStat = "RoboSort/SpeedBonus";
         private const string NoProductPushPenaltyStat = "RoboSort/NoProductPushPenalty";
         private const string GoodProductPushPenaltyStat = "RoboSort/GoodProductPushPenalty";
+        private const string DefectAlignmentRewardStat = "RoboSort/DefectAlignmentReward";
 
         private const float NoPushDefault = -1f;
         private const float HiddenProductTypeObservationValue = 0.5f;
@@ -63,9 +65,22 @@ namespace RoboSortRL.Agents
         [SerializeField] private float distanceNormalization = 6f;
         [SerializeField] private float conveyorSpeedNormalization = 3f;
 
-        [Header("Rewards")]
-        [SerializeField] private float correctSortReward = 1f;
-        [SerializeField] private float incorrectSortPenalty = -1f;
+        [Header("Outcome Rewards")]
+        [Tooltip("Reward for a good product correctly reaching AcceptZone.")]
+        [FormerlySerializedAs("correctSortReward")]
+        [SerializeField] private float goodAcceptedReward = 1f;
+
+        [Tooltip("Higher reward for correctly rejecting a defective product.")]
+        [SerializeField] private float defectRejectedReward = 1.5f;
+
+        [Tooltip("Penalty for wrongly rejecting a good product.")]
+        [FormerlySerializedAs("incorrectSortPenalty")]
+        [SerializeField] private float goodRejectedPenalty = -1.5f;
+
+        [Tooltip("Higher penalty for missing a defective product. False negatives are costly in quality control.")]
+        [SerializeField] private float defectMissedPenalty = -2f;
+
+        [Header("Time Penalty")]
         [SerializeField] private float timePenaltyPerDecision = -0.001f;
         [SerializeField] private bool endEpisodeOnSortingOutcome = true;
 
@@ -77,6 +92,21 @@ namespace RoboSortRL.Agents
         [SerializeField] private float goodProductPushPenalty = -0.005f;
         [SerializeField] private float pushPenaltyThreshold = 0.5f;
         [SerializeField] private float extensionPenaltyThreshold = 0.2f;
+
+        [Header("Defect Alignment Shaping")]
+        [Tooltip("Small discovery reward for improving Z alignment with a defective product near the sorting zone.")]
+        [SerializeField] private bool useDefectAlignmentShaping = true;
+
+        [Tooltip("Reward multiplier for reducing Z alignment error with a defective product.")]
+        [SerializeField] private float defectAlignmentProgressRewardScale = 0.01f;
+
+        [Tooltip("Maximum shaping reward allowed per decision.")]
+        [SerializeField] private float maxDefectAlignmentRewardPerDecision = 0.003f;
+
+        [Tooltip("Allows shaping slightly before/after the sorting zone so the agent can prepare the pusher.")]
+        [SerializeField] private float defectAlignmentZonePadding = 0.75f;
+
+        [SerializeField] private float previousDefectAlignmentError = -1f;
 
         [Header("Debug")]
         [SerializeField] private bool hasOutcomeThisEpisode;
@@ -120,6 +150,7 @@ namespace RoboSortRL.Agents
             hasOutcomeThisEpisode = false;
             lastOutcomeReward = 0f;
             decisionsThisEpisode = 0;
+            previousDefectAlignmentError = -1f;
 
             if (episodeManager == null)
             {
@@ -173,6 +204,7 @@ namespace RoboSortRL.Agents
             }
 
             ApplyPushDisciplinePenalty(pushStrengthInput);
+            ApplyDefectAlignmentShaping();
         }
 
         public override void Heuristic(in ActionBuffers actionsOut)
@@ -339,21 +371,93 @@ namespace RoboSortRL.Agents
             }
         }
 
+        // Asymmetric reward: defect-related outcomes are weighted more heavily
+        // because false negatives have higher real-world cost in quality control.
+        // Symmetric +1/-1 rewards were tested first; this variant is for reducing
+        // DefectMissed behavior after the corrected pusher-contact change.
         private float GetRewardForOutcome(SortingOutcome outcome)
         {
             switch (outcome)
             {
                 case SortingOutcome.GoodAccepted:
+                    return goodAcceptedReward + GetCorrectSortSpeedBonus();
+
                 case SortingOutcome.DefectRejected:
-                    return correctSortReward + GetCorrectSortSpeedBonus();
+                    return defectRejectedReward + GetCorrectSortSpeedBonus();
 
                 case SortingOutcome.GoodRejected:
+                    return goodRejectedPenalty;
+
                 case SortingOutcome.DefectMissed:
-                    return incorrectSortPenalty;
+                    return defectMissedPenalty;
 
                 default:
                     return 0f;
             }
+        }
+
+        private void ApplyDefectAlignmentShaping()
+        {
+            if (!useDefectAlignmentShaping || sorterController == null || productSpawner == null)
+            {
+                previousDefectAlignmentError = -1f;
+                return;
+            }
+
+            Product currentProduct = productSpawner.CurrentProduct;
+            bool hasDefectiveProduct = currentProduct != null
+                                       && currentProduct.gameObject.activeInHierarchy
+                                       && !currentProduct.HasBeenProcessed
+                                       && currentProduct.IsDefective;
+
+            if (!hasDefectiveProduct || !IsInsideOrNearSortingZone(currentProduct.transform.position, defectAlignmentZonePadding))
+            {
+                previousDefectAlignmentError = -1f;
+                return;
+            }
+
+            Vector3 sorterLocalProductPosition = sorterController.transform.InverseTransformPoint(
+                currentProduct.transform.position
+            );
+
+            float currentAlignmentError = Mathf.Abs(
+                sorterLocalProductPosition.z - sorterController.CurrentCarriageZOffset
+            );
+
+            if (previousDefectAlignmentError >= 0f)
+            {
+                float improvement = previousDefectAlignmentError - currentAlignmentError;
+
+                if (improvement > 0f)
+                {
+                    float reward = Mathf.Min(
+                        improvement * defectAlignmentProgressRewardScale,
+                        maxDefectAlignmentRewardPerDecision
+                    );
+
+                    AddReward(reward);
+                    Academy.Instance.StatsRecorder.Add(
+                        DefectAlignmentRewardStat,
+                        reward,
+                        StatAggregationMethod.Sum
+                    );
+                }
+            }
+
+            previousDefectAlignmentError = currentAlignmentError;
+        }
+
+        private bool IsInsideOrNearSortingZone(Vector3 worldPosition, float padding)
+        {
+            if (sortingZone == null)
+            {
+                return false;
+            }
+
+            Vector3 closestPoint = sortingZone.ClosestPoint(worldPosition);
+            float distance = Vector3.Distance(worldPosition, closestPoint);
+
+            return distance <= Mathf.Max(0f, padding);
         }
 
         private float GetCorrectSortSpeedBonus()
@@ -380,12 +484,12 @@ namespace RoboSortRL.Agents
                 return;
             }
 
-            if (pushStrengthInput <= pushPenaltyThreshold)
+            if (sorterController == null || sorterController.PushStrength <= pushPenaltyThreshold)
             {
                 return;
             }
 
-            if (sorterController == null || sorterController.ExtensionAmount < extensionPenaltyThreshold)
+            if (sorterController.ExtensionAmount < extensionPenaltyThreshold)
             {
                 return;
             }

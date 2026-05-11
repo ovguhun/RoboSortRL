@@ -1,3 +1,5 @@
+> **Final update:** The current selected final demo model is documented in docs/final_model_update.md and README.md.
+> Older Defect30 references in this file are retained as historical training notes, not the final selected demo model.
 # Risk Register
 
 ## RoboSortRL Pro
@@ -93,3 +95,4 @@ The current strongest RL core is:
 - near-perfect PPO accuracy after full training
 
 This is the current preferred final RL configuration because it demonstrates sensor-driven reinforcement learning while staying stable and explainable.
+

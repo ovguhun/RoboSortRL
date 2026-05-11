@@ -430,8 +430,8 @@ MonoBehaviour:
   minExtensionAmount: 0.2
   minPushStrength: 0.5
   pushSpeed: 3
-  pushVolumeLocalOffset: {x: 0.55, y: 0, z: 0}
-  pushVolumeHalfExtents: {x: 1.35, y: 0.35, z: 0.55}
+  pushVolumeLocalOffset: {x: 0.7, y: 0, z: 0}
+  pushVolumeHalfExtents: {x: 0.1, y: 0.35, z: 0.55}
   productLayerMask:
     serializedVersion: 2
     m_Bits: 128
@@ -646,7 +646,7 @@ MonoBehaviour:
   spawnOnStart: 0
   autoSpawn: 0
   spawnIntervalSeconds: 2.5
-  defectProbability: 0.3
+  defectProbability: 0.35
   randomizeSpawnX: 1
   spawnXRange: 0.5
   useFixedSeed: 0
@@ -1267,17 +1267,24 @@ MonoBehaviour:
   velocityNormalization: 6
   distanceNormalization: 6
   conveyorSpeedNormalization: 3
-  correctSortReward: 1
-  incorrectSortPenalty: -1
+  goodAcceptedReward: 1
+  defectRejectedReward: 1.5
+  goodRejectedPenalty: -1.5
+  defectMissedPenalty: -2
   timePenaltyPerDecision: -0.001
   endEpisodeOnSortingOutcome: 1
-  useRewardV2: 0
-  correctSortSpeedBonus: 0.1
+  useRewardV2: 1
+  correctSortSpeedBonus: 0
   targetDecisionsForMaxSpeedBonus: 300
   noProductPushPenalty: -0.005
-  goodProductPushPenalty: -0.005
+  goodProductPushPenalty: -0.01
   pushPenaltyThreshold: 0.5
   extensionPenaltyThreshold: 0.2
+  useDefectAlignmentShaping: 1
+  defectAlignmentProgressRewardScale: 0.01
+  maxDefectAlignmentRewardPerDecision: 0.003
+  defectAlignmentZonePadding: 0.75
+  previousDefectAlignmentError: -1
   hasOutcomeThisEpisode: 0
   lastOutcome: 0
   lastOutcomeReward: 0
