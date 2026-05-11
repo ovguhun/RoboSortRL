@@ -158,20 +158,22 @@ Expected demo behavior:
 
 Activate the ML-Agents environment:
 
-```
+```bash
 conda activate mlagents
-cd "C:\Users\ovguh\Desktop\UnityProjects\RoboSortRL-Pro"
-```
+cd path/to/RoboSortRL-Pro
 
 Example PPO command:
 
 ```
-mlagents-learn config/robosort_ppo_baseline.yaml `
-    --run-id=RoboSort_PPO_PushDiscipline_ActuatorPenaltyFix_Baseline_001 `
-    --initialize-from=RoboSort_PPO_PusherContact_PushDiscipline_Defect35_Baseline_001 `
-    --results-dir results `
+mlagents-learn config/robosort_ppo_baseline.yaml \
+    --run-id=RoboSort_PPO_Baseline_001 \
+    --results-dir results \
     --torch-device cpu
 ```
+
+To resume from a previous checkpoint, add:
+
+    --initialize-from=Previous_Run_ID
 
 ### Documentation
 
